@@ -103,11 +103,14 @@ private:
 	///Placeholder for default-constructed poly
 	struct invalid_type : Base {};
 
-	std::unique_ptr<Base> data;
-	Base* (*const copy_construct)(const void* const);
-public:
 	///RTTI of type, stored inside
-	const type_index_t stored_type;
+	type_index_t stored_type;
+
+	std::unique_ptr<Base> data;
+	Base* (*copy_construct)(const void* const);
+public:
+	///Get RTTI of type, stored inside
+	constexpr type_index_t& get_stored_type() const;
 
 	/*!
 	\brief   Access operator
@@ -217,11 +220,21 @@ public:
 	*/
 	constexpr poly(const poly& other);
 	
+	poly& operator=(const poly& rhs) = default;
+	poly& operator=(poly&& rhs) = default;
+
 	///Move constructor
 	constexpr poly(poly&& other) = default; //Move constructor
 
 	~poly() = default; //Destructor
 };
+
+
+
+template<typename Base>
+constexpr type_index_t & poly<Base>::get_stored_type() const {
+	return stored_type;
+}
 
 template<typename Base>
 inline Base * poly<Base>::operator->() {
