@@ -89,8 +89,6 @@ constexpr typename std::enable_if<
 
 } // namespace details
 
-
-
 /*!
 \brief   Class that can hold any object derived from Base class
 \details This class holds information about its object. In particular, it
@@ -102,10 +100,15 @@ constexpr typename std::enable_if<
 template<typename Base>
 class poly {
 private:
+	///Placeholder for default-constructed poly
+	struct invalid_type : Base {};
+
 	std::unique_ptr<Base> data;
-	const type_index_t stored_type;
 	Base* (*const copy_construct)(const void* const);
 public:
+	///RTTI of type, stored inside
+	const type_index_t stored_type;
+
 	/*!
 	\brief   Access operator
 	\details Grants access to the object through Base* pointer.
@@ -170,8 +173,13 @@ public:
 		std::is_base_of<Base, T>::value, T&>::type
 		as() const;
 
-	///Default constructor. Will initialize internal pointer to nullptr
-	constexpr poly() = default;
+	/*!
+	\brief   Default constructor.
+	\details Since no object is being held inside, stored_type will be equal to
+	         poly::invalid_type. is<poly::invalid_type> will evaluate to true, and
+			 using as<> to cast to any (meaningful) type will throw.
+	*/
+	constexpr poly();
 	
 	/*!
 	\brief   Deep-Copy constructor.
@@ -281,6 +289,13 @@ constexpr poly<Base>::poly(Derived && obj) :
 	data(new Derived(std::move(obj))),
 	stored_type(typeid(Derived)),
 	copy_construct(&details::copy_ctor<Base, Derived>) 
+{}
+
+template<typename Base>
+constexpr poly<Base>::poly() :
+	data (nullptr),
+	stored_type (type_index_t(typeid(invalid_type))),
+	copy_construct(&details::copy_ctor<Base, invalid_type>)
 {}
 
 template<typename Base>

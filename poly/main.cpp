@@ -21,7 +21,7 @@ POLYREF_CTOR(B, D)
 POLYREF_CTOR(B, E)
 
 int main() {
-	auto t = make_s<B>("D");
+	auto t = make_s<B>("struct D");
 	t.as<D>().y = 5;
 	t.as<D>().x = 4;
 	std::cout << t.as<D>().y << std::endl;
