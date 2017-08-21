@@ -23,7 +23,7 @@ POLYREF_CTOR(B, E)
 int main() {
 	auto t = make_s<B>("struct D");
 	auto t2 = t;
-	t2 = make_s<B>("struct E");
+	t2 = make<B>("struct E");
 
 	auto list = zhukov::factory<B>::list();
 	for (auto&& it : list) {

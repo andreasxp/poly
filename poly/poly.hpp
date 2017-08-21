@@ -110,7 +110,7 @@ private:
 	Base* (*copy_construct)(const void* const);
 public:
 	///Get RTTI of type, stored inside
-	constexpr type_index_t& get_stored_type() const;
+	constexpr const type_index_t& get_stored_type() const;
 
 	/*!
 	\brief   Access operator
@@ -232,7 +232,7 @@ public:
 
 
 template<typename Base>
-constexpr type_index_t & poly<Base>::get_stored_type() const {
+constexpr const type_index_t & poly<Base>::get_stored_type() const {
 	return stored_type;
 }
 
