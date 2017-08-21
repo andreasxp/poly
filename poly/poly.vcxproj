@@ -126,7 +126,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pmr.hpp" />
     <ClInclude Include="poly.hpp" />
     <ClInclude Include="poly_factory.hpp" />
   </ItemGroup>
