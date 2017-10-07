@@ -17,15 +17,22 @@ struct E : B {
 	int y;
 };
 
-POLYREF_CTOR(B, D)
-POLYREF_CTOR(B, E)
+//POLYREF_CTOR(decltype(f), D)
+//POLYREF_CTOR(decltype(f), E)
 
 int main() {
-	auto t = make_s<B>("struct D");
-	auto t2 = t;
-	t2 = make<B>("struct E");
+	factory<B> f;
+	f.add<D>();
+	f.add<E>();
 
-	auto list = zhukov::factory<B>::list();
+	auto t = f.make("struct D");
+	auto t2 = t;
+	t2 = f.make("struct E");
+	t2.as<E>().y = 12;
+
+	std::cout << t2.as<E>().y << std::endl;
+
+	auto list = f.list();
 	for (auto&& it : list) {
 		std::cout << it << std::endl;
 	}
