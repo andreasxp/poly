@@ -25,7 +25,7 @@ SOFTWARE.
 
 #include <unordered_map> // std::unordered_map
 #include <vector> // std::vector
-#include "poly.hpp" // basic_poly, poly
+#include "poly.hpp" // poly_t, poly
 
 ///Namespace for all functions and classes, to not pollute global namespace
 namespace zhukov {
@@ -34,39 +34,38 @@ namespace zhukov {
 namespace detail {
 
 /*!
-\brief   Makes a basic_poly object, holding default-ctructed derived_t object
-\details This function is only enabled if basic_poly::element_type is base of
+\brief   Makes a poly_t object, holding default-ctructed derived_t object
+\details This function is only enabled if poly_t::element_type is base of
          derived_t and derived_t can be default-constructed.
-\tparam  basic_poly poly wrapper to insert object in
+\tparam  poly_t poly wrapper to insert object in
 \tparam  derived_t  type of which a default-ctor will be invoked
 */
-template <typename basic_poly, typename derived_t>
-constexpr typename std::enable_if<std::is_base_of<typename basic_poly::element_type, derived_t>::value && std::is_default_constructible<derived_t>::value, basic_poly>::type
+template <typename poly_t, typename derived_t>
+constexpr typename std::enable_if<std::is_base_of<typename poly_t::element_type, derived_t>::value && std::is_default_constructible<derived_t>::value, poly_t>::type
 make_impl() {
-	return basic_poly(derived_t());
+	return poly_t(derived_t());
 }
 
 } // namespace detail
 
-
 /*!
-\brief   Class that can make a basic_poly using a string with type's name
+\brief   Class that can make a poly_t using a string with type's name
 \details This is poor man's reflection: register a class, and now you can
          make poly<> from just passing string("type").
-\tparam  basic_poly what to store built objects in
+\tparam  poly_t what to store built objects in
 */
-template <typename basic_poly>
+template <typename poly_t>
 class basic_factory {
 private:
-	std::unordered_map<std::string, basic_poly(*)()> make_funcs;
+	std::unordered_map<std::string, poly_t(*)()> make_funcs;
 public:
 	/*!
 	\brief   Add a class to factory, so it can be created by a string
 	\tparam  derived_t Type to register. Must be derived from 
-	                   basic_poly::element_type.
+	                   poly_t::element_type.
 	*/
 	template <typename derived_t>
-	constexpr typename std::enable_if<std::is_base_of<typename basic_poly::element_type, derived_t>::value && std::is_default_constructible<derived_t>::value, void>::type
+	constexpr typename std::enable_if<std::is_base_of<typename poly_t::element_type, derived_t>::value && std::is_default_constructible<derived_t>::value, void>::type
 		add();
 
 	///Get a vector of all names of classes that are registered
@@ -76,18 +75,18 @@ public:
 	\brief   Make an object from string containing its name
 	\param   name string that contains object's type
 	*/
-	basic_poly make(const std::string name) const;
+	poly_t make(const std::string name) const;
 };
 
-template<typename basic_poly>
+template<typename poly_t>
 template<typename derived_t>
-inline constexpr typename std::enable_if<std::is_base_of<typename basic_poly::element_type, derived_t>::value && std::is_default_constructible<derived_t>::value, void>::type
-basic_factory<basic_poly>::add() {
-	make_funcs[typename basic_poly::rtti_index(typeid(derived_t)).name()] = &detail::make_impl<basic_poly, derived_t>;
+constexpr typename std::enable_if<std::is_base_of<typename poly_t::element_type, derived_t>::value && std::is_default_constructible<derived_t>::value, void>::type
+basic_factory<poly_t>::add() {
+	make_funcs[typename poly_t::rtti_index(typeid(derived_t)).name()] = &detail::make_impl<poly_t, derived_t>;
 }
 
-template<typename basic_poly>
-inline std::vector<std::string> basic_factory<basic_poly>::list() const {
+template<typename poly_t>
+inline std::vector<std::string> basic_factory<poly_t>::list() const {
 	std::vector<std::string> rslt;
 
 	for (auto&& it : make_funcs) {
@@ -97,8 +96,8 @@ inline std::vector<std::string> basic_factory<basic_poly>::list() const {
 	return rslt;
 }
 
-template<typename basic_poly>
-inline basic_poly basic_factory<basic_poly>::make(const std::string name) const {
+template<typename poly_t>
+inline poly_t basic_factory<poly_t>::make(const std::string name) const {
 	return make_funcs.at(name)();
 }
 
