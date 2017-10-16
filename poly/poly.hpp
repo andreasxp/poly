@@ -90,28 +90,26 @@ constexpr typename std::enable_if<
 \brief   Class that can hold any object derived from base_t class
 \details This class holds information about its object. In particular, it
          remembers its type which can be used to safely cast the object
-         using basic_poly::as.
+         using poly::as.
 \tparam  base_t Class that all the objects must derive from
-\see     basic_poly::as
+\see     poly::as
 */
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
-class basic_poly {
+template<typename base_t>
+class poly {
 public:
 	using element_type = base_t;
-	using rtti_index = type_index_t;
-	using smart_pointer = smart_ptr_t;
 private:
-	///Placeholder for default-constructed basic_poly
+	///Placeholder for default-constructed poly
 	struct invalid_type : base_t {};
 
 	///RTTI of type, stored inside
-	type_index_t stored_type;
+	std::type_index stored_type;
 
-	smart_ptr_t data;
+	std::unique_ptr<base_t> data;
 	base_t* (*copy_construct)(const void* const);
 public:
 	///Get RTTI of type, stored inside
-	constexpr const type_index_t& get_stored_type() const;
+	constexpr const std::type_index& get_stored_type() const;
 
 	/*!
 	\brief   Access operator
@@ -150,7 +148,7 @@ public:
 	constexpr bool is() const;
 	
 	/*!
-	\brief   Allows to access basic_poly object as if it was not polymorphic
+	\brief   Allows to access poly object as if it was not polymorphic
 	\details This function is similar to dynamic_cast, but it only casts
 	         successfully if the type of object that is casted is exactly T.
 	         as() is almost as fast as static_cast
@@ -164,7 +162,7 @@ public:
 		as();
 
 	/*!
-	\brief   Allows to access basic_poly<base_t, type_index_t, smart_ptr_t> as the original class
+	\brief   Allows to access poly<base_t> as the original class
 	\details This function is similar to dynamic_cast, but it only casts
 	         successfully if the type of object that is casted is exactly T. 
 			 as() is almost as fast as static_cast
@@ -180,10 +178,10 @@ public:
 	/*!
 	\brief   Default constructor.
 	\details Since no object is being held inside, stored_type will be equal to
-	         basic_poly::invalid_type. is<basic_poly::invalid_type> will evaluate to true, and
+	         poly::invalid_type. is<poly::invalid_type> will evaluate to true, and
 			 using as<> to cast to any (meaningful) type will throw.
 	*/
-	constexpr basic_poly();
+	constexpr poly();
 	
 	/*!
 	\brief   Deep-Copy constructor.
@@ -197,7 +195,7 @@ public:
 	template <typename derived_t, typename Condition = typename std::enable_if<
 		std::is_base_of<base_t, derived_t>::value &&
 		std::is_copy_constructible<derived_t>::value>::type>
-		constexpr basic_poly(const derived_t& obj);
+		constexpr poly(const derived_t& obj);
 
 	/*!
 	\brief   Deep-Move constructor.
@@ -211,7 +209,7 @@ public:
 	template <typename derived_t, typename Condition = typename std::enable_if<
 		std::is_base_of<base_t, derived_t>::value &&
 		std::is_move_constructible<derived_t>::value>::type>
-		constexpr basic_poly(derived_t&& obj); //Deep-Move constructor
+		constexpr poly(derived_t&& obj); //Deep-Move constructor
 	
 	/*!
 	\brief Copy constructor. Internal object will be copied with it's copy
@@ -219,56 +217,54 @@ public:
 	\throw std::runtime_error if internal object's copy constructor is
 	       deleted
 	*/
-	constexpr basic_poly(const basic_poly& other);
+	constexpr poly(const poly& other);
 	
-	basic_poly& operator=(const basic_poly& rhs) = default;
-	basic_poly& operator=(basic_poly&& rhs) = default;
+	poly& operator=(const poly& rhs) = default;
+	poly& operator=(poly&& rhs) = default;
 
 	///Move constructor
-	constexpr basic_poly(basic_poly&& other) = default;
+	constexpr poly(poly&& other) = default;
 
 	///Destructor
-	~basic_poly() = default;
+	~poly() = default;
 };
 
-
-
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
-constexpr const type_index_t & basic_poly<base_t, type_index_t, smart_ptr_t>::get_stored_type() const {
+template<typename base_t>
+constexpr const std::type_index & poly<base_t>::get_stored_type() const {
 	return stored_type;
 }
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
-inline base_t * basic_poly<base_t, type_index_t, smart_ptr_t>::operator->() {
+template<typename base_t>
+inline base_t * poly<base_t>::operator->() {
 	return data.get();
 }
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
-constexpr base_t * basic_poly<base_t, type_index_t, smart_ptr_t>::operator->() const {
+template<typename base_t>
+constexpr base_t * poly<base_t>::operator->() const {
 	return data.get();
 }
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
-inline base_t * basic_poly<base_t, type_index_t, smart_ptr_t>::get() {
+template<typename base_t>
+inline base_t * poly<base_t>::get() {
 	return data.get();
 }
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
-constexpr base_t * basic_poly<base_t, type_index_t, smart_ptr_t>::get() const {
+template<typename base_t>
+constexpr base_t * poly<base_t>::get() const {
 	return data.get();
 }
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
+template<typename base_t>
 template<typename T>
-constexpr bool basic_poly<base_t, type_index_t, smart_ptr_t>::is() const {
-	return stored_type == type_index_t(typeid(T));
+constexpr bool poly<base_t>::is() const {
+	return stored_type == std::type_index(typeid(T));
 }
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
+template<typename base_t>
 template <typename T>
 typename std::enable_if<
 	std::is_base_of<base_t, T>::value, T&>::type
-	basic_poly<base_t, type_index_t, smart_ptr_t>::as() {
+	poly<base_t>::as() {
 
 	if (is<T>()) {
 		return static_cast<T&>(*get());
@@ -280,92 +276,45 @@ typename std::enable_if<
 		: throw std::bad_cast();*/
 }
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
+template<typename base_t>
 template <typename T>
 constexpr typename std::enable_if<
 	std::is_base_of<base_t, T>::value, T&>::type
-	basic_poly<base_t, type_index_t, smart_ptr_t>::as() const {
+	poly<base_t>::as() const {
 	return is<T>()
 		? static_cast<T&>(*get())
 		: throw std::bad_cast();
 }
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
+template<typename base_t>
 template<typename derived_t, typename Condition>
-constexpr basic_poly<base_t, type_index_t, smart_ptr_t>::basic_poly(const derived_t& obj) :
+constexpr poly<base_t>::poly(const derived_t& obj) :
 	data(new derived_t(obj)),
 	stored_type(typeid(derived_t)),
 	copy_construct(&detail::poly_copy<base_t, derived_t>) 
 {}
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
+template<typename base_t>
 template<typename derived_t, typename Condition>
-constexpr basic_poly<base_t, type_index_t, smart_ptr_t>::basic_poly(derived_t && obj) :
+constexpr poly<base_t>::poly(derived_t && obj) :
 	data(new derived_t(std::move(obj))),
 	stored_type(typeid(derived_t)),
 	copy_construct(&detail::poly_copy<base_t, derived_t>) 
 {}
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
-constexpr basic_poly<base_t, type_index_t, smart_ptr_t>::basic_poly() :
+template<typename base_t>
+constexpr poly<base_t>::poly() :
 	data (nullptr),
-	stored_type (type_index_t(typeid(invalid_type))),
+	stored_type (std::type_index(typeid(invalid_type))),
 	copy_construct(&detail::poly_copy<base_t, invalid_type>)
 {}
 
-template<typename base_t, typename type_index_t, typename smart_ptr_t>
-constexpr basic_poly<base_t, type_index_t, smart_ptr_t>::basic_poly(const basic_poly & other) :
+template<typename base_t>
+constexpr poly<base_t>::poly(const poly & other) :
 	data(other.copy_construct(other.data.get())),
 	stored_type(other.stored_type),
 	copy_construct(other.copy_construct) 
 {}
-
-template<typename base_t>
-using poly = basic_poly<base_t, std::type_index, std::unique_ptr<base_t>>;
-
-/*!
-\brief   Casts polymorphic base_t-pointers to their class
-\details This function is similar to dynamic_cast, but it only casts
-         successfully if the type of object that is casted is exactly T. exact_cast is
-         almost as fast as static_cast
-\tparam  T Pointer to type to cast to
-\tparam  base_t base_t class. Function is only enabled if base_t is base_t of T.
-\param   obj Object to be casted
-\return  pointer to casted object or nullptr if casting failed
-\see     basic_poly
-*/
-/*template <typename T, typename base_t, typename type_index_t, typename smart_ptr_t>
-constexpr typename std::enable_if<
-	std::is_pointer<T>::value &&
-	std::is_base_of<base_t, 
-	typename std::remove_pointer<T>::type>::value, T>::type
-	exact_cast(const basic_poly<base_t, type_index_t, smart_ptr_t>& obj) {
-	return obj.template is<std::remove_pointer<T>::type>()
-		? static_cast<T>(obj.get())
-		: nullptr;
-}*/
-
-/*!
-\brief   Casts polymorphic base_t-pointers to their class
-\details This function is similar to dynamic_cast, but it only casts
-         successfully if the type of object that is casted is exactly T. exact_cast is
-         almost as fast as static_cast
-\tparam  T Pointer to type to cast to
-\tparam  base_t base_t class. Function is only enabled if base_t is base_t of T.
-\param   obj Object to be casted
-\throw   std::bad_cast if object is not exactly of type T
-\see     basic_poly
-*/
-/*template <typename T, typename base_t, typename type_index_t, typename smart_ptr_t>
-constexpr typename std::enable_if<
-	!std::is_pointer<T>::value && 
-	std::is_base_of<base_t, T>::value, T>::type
-	exact_cast(const basic_poly<base_t, type_index_t, smart_ptr_t>& obj) {
-	return obj.template is<T>()
-		? *static_cast<T*>(obj.get())
-		: throw std::bad_cast();
-}*/
-
 
 } // namespace zhukov
 
