@@ -35,7 +35,14 @@ int main() {
 		poly<A> pa(ptr);
 		poly<B> pb(pa);
 
+		pb.as<C>().c = -1;
+
 		cout << pb->b << endl;
+		cout << "A: " << pb.is<A>() << endl;
+		cout << "B: " << pb.is<B>() << endl;
+		cout << "C: " << pb.is<C>() << endl;
+
+		cout << pb.as<C>().c << endl;
 	}
 	catch (const std::exception& e) {
 		cout << e.what() << endl;

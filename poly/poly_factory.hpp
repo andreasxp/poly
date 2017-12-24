@@ -25,7 +25,7 @@ SOFTWARE.
 
 #include <unordered_map> // std::unordered_map
 #include <vector> // std::vector
-#include "poly.hpp" // base_t, poly
+#include "poly.hpp" // zhukov::poly
 
 ///Namespace for all functions and classes, to not pollute global namespace
 namespace zhukov {
@@ -81,7 +81,7 @@ template<typename base_t>
 template<typename derived_t>
 constexpr typename std::enable_if<std::is_base_of<base_t, derived_t>::value && std::is_default_constructible<derived_t>::value, void>::type
 factory<base_t>::add() {
-	make_funcs[std::type_index(typeid(derived_t)).name()] = &detail::make_impl<base_t, derived_t>;
+	make_funcs[POLY_TYPE_NAME(derived_t)] = &detail::make_impl<base_t, derived_t>;
 }
 
 template<typename base_t>
