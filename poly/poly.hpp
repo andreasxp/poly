@@ -30,8 +30,20 @@ SOFTWARE.
 ///Error thrown by trying to down- or sidecast
 #define POLY_ASSERT_POLYMORPHIC static_assert(std::is_polymorphic<base_t>::value, "poly can only be used with polymorphic types");
 
-///Get name of type (for pretty_index compatability)
+/*!
+\brief   Macro to override typeid for rtti in poly
+\details Define POLY_CUSTOM_RTTI(type) as a function that returns
+         your type's name. Do this **before** including poly.hpp
+		 or poly_factory.hpp
+\example #define POLY_CUSTOM_RTTI(type) my_typeid(type).name();
+\example #define POLY_CUSTOM_RTTI(type) pretty_index<type>().name();
+*/
+#ifdef POLY_CUSTOM_RTTI
+#define POLY_TYPE_NAME POLY_CUSTOM_RTTI
+#else
+///Get name of type
 #define POLY_TYPE_NAME(type) typeid(type).name()
+#endif
 
 ///Namespace for all functions and classes, to not pollute global namespace
 namespace zhukov {
