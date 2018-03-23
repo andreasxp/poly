@@ -143,9 +143,6 @@ private:
 	std::unique_ptr<base_t> value;
 	void* (*copy_construct)(const void* const);
 public:
-	///Get RTTI of type, stored inside
-	constexpr const std::type_index& get_stored_type() const;
-
 	/*!
 	\brief   Access operator
 	\details Grants access to the object through base_t& reference.

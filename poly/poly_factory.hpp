@@ -43,7 +43,7 @@ namespace detail {
 template <typename base_t, typename derived_t>
 constexpr typename std::enable_if<std::is_base_of<base_t, derived_t>::value && std::is_default_constructible<derived_t>::value, poly<base_t>>::type
 make_impl() {
-	return poly<base_t>(derived_t());
+	return poly<base_t>(new derived_t);
 }
 
 } // namespace detail

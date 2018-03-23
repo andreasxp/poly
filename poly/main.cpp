@@ -12,7 +12,7 @@ struct A {
 	virtual ~A() = default;
 };
 
-struct B {
+struct B : A {
 	int b;
 
 	virtual ~B() = default;
@@ -27,22 +27,11 @@ struct C : B, A {
 
 int main() {
 	try {
-		auto* ptr = new C;
-		ptr->a = 10;
-		ptr->b = 20;
-		ptr->c = 30;
+		factory<A> fac;
 
-		poly<A> pa(ptr);
-		poly<B> pb(pa);
-
-		pb.as<C>().c = -1;
-
-		cout << pb->b << endl;
-		cout << "A: " << pb.is<A>() << endl;
-		cout << "B: " << pb.is<B>() << endl;
-		cout << "C: " << pb.is<C>() << endl;
-
-		cout << pb.as<C>().c << endl;
+		fac.add<B>();
+		
+		poly<A> var = fac.make("struct B");
 	}
 	catch (const std::exception& e) {
 		cout << e.what() << endl;
