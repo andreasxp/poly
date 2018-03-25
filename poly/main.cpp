@@ -27,15 +27,10 @@ struct C : B, A {
 
 int main() {
 	try {
-		factory<A> fac;
+		auto var = make_poly<A, B>();
+		var.as<B>().b = 10;
 
-		fac.add<B>();
-		
-		poly<A> var = fac.make("struct B");
-		var.as<B>().b = 6;
-
-		poly<A> var2(std::move(var));
-		var = var2;
+		auto var2 = var;
 
 		cout << var2.as<B>().b;
 	}

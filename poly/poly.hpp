@@ -380,6 +380,20 @@ public:
 	friend class poly;
 };
 
+/*!
+\brief   Function to efficiently create poly
+\details This constructor will build a poly<base_t>
+         with a derived_t object, constructed with args.
+\tparam  base_t Type of poly.
+\tparam  derived_t Type of object to be constructed.
+\param   args Arguments to build derived_t
+*/
+template <class base_t, class derived_t, class... Args>
+poly<base_t> make_poly(Args&&... args) {
+	return poly<base_t>(new derived_t(std::forward<Args>(args)...));
+}
+
+// Definitions =================================================================
 template<typename base_t>
 inline base_t & poly<base_t>::operator*() {
 	return *value;
