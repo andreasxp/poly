@@ -27,7 +27,7 @@ SOFTWARE.
 #include <typeinfo> // std::type_info
 #include <typeindex> // std::type_index
 
-///Error thrown by trying to down- or sidecast
+/// Check if a type is polymorphic (and so can be used in poly)
 #define POLY_ASSERT_POLYMORPHIC static_assert(std::is_polymorphic<base_t>::value, "poly can only be used with polymorphic types");
 
 /*!
@@ -42,14 +42,21 @@ SOFTWARE.
 #ifdef POLY_CUSTOM_RTTI
 #define POLY_TYPE_NAME POLY_CUSTOM_RTTI
 #else
-///Get name of type
+/// Get name of type
 #define POLY_TYPE_NAME(...) typeid(__VA_ARGS__).name()
 #endif
 
-///Namespace for all functions and classes, to not pollute global namespace
+/// Attribute for fake copy function
+#if __has_cpp_attribute(deprecated)
+#define POLY_UNUSED [[maybe_unused]]
+#else
+#define POLY_UNUSED
+#endif
+
+/// Namespace for all functions and classes, to not pollute global namespace
 namespace zhukov {
 
-///Namespace for internal-use-only functions
+/// Namespace for internal-use-only functions
 namespace detail {
 //Black magic ahead
 
@@ -93,8 +100,8 @@ template <typename base_t, typename derived_t>
 constexpr typename std::enable_if<
 	std::is_base_of<base_t, derived_t>::value &&
 	!std::is_copy_constructible<derived_t>::value, void*>::type //Note the !
-	poly_copy(const void* other) {
-	throw std::runtime_error(
+	poly_copy(const void* other POLY_UNUSED) {
+	return throw std::runtime_error(
 		"attempting to copy-construct a non-copyable object");
 }
 
