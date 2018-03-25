@@ -6,20 +6,36 @@
 using namespace zhukov;
 using namespace std;
 
-struct A {
+struct Base {
 	int a;
 
-	virtual ~A() = default;
+	Base() : a(1) {}
+	virtual ~Base() = default;
 };
 
-struct B : A {
-	int b;
-
-	virtual ~B() = default;
+struct Mid1 : Base {
+	int x;
+	Mid1() : x(2) {}
+	virtual ~Mid1() = default;
 };
 
-struct C : B, A {
-	int c;
+struct Mid2 : Base {
+	int y;
+
+	Mid2() : y(3) {}
+	virtual ~Mid2() = default;
+};
+
+struct Mid3 : Base {
+	int h;
+
+	Mid3() : h(3) {}
+	virtual ~Mid3() = default;
+};
+
+struct Der : Mid1, Mid2 {
+	Der() : z(4) {}
+	int z;
 };
 
 //POLYREF_CTOR(decltype(f), D)
@@ -27,12 +43,13 @@ struct C : B, A {
 
 int main() {
 	try {
-		auto var = make_poly<A, B>();
-		var.as<B>().b = 10;
+		factory<Base> pf;
+		pf.add<Der>();
 
-		auto var2 = var;
+		auto v1 = make_poly<Mid1, Der>();
+		poly<Mid3> v2 = v1;
 
-		cout << var2.as<B>().b;
+		cout << v2->h;
 	}
 	catch (const std::exception& e) {
 		cout << e.what() << endl;
