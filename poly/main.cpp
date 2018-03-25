@@ -32,8 +32,12 @@ int main() {
 		fac.add<B>();
 		
 		poly<A> var = fac.make("struct B");
-		poly<A> var2(var);
-		var2 = std::move(var);
+		var.as<B>().b = 6;
+
+		poly<A> var2(std::move(var));
+		var = var2;
+
+		cout << var2.as<B>().b;
 	}
 	catch (const std::exception& e) {
 		cout << e.what() << endl;

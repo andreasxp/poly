@@ -72,8 +72,8 @@ template <typename base_t, typename derived_t>
 constexpr typename std::enable_if<
 	std::is_base_of<base_t, derived_t>::value &&
 	std::is_copy_constructible<derived_t>::value, void*>::type
-	poly_copy(const void* const other) {
-	return new derived_t(*static_cast<const derived_t* const>(other));
+	poly_copy(const void* other) {
+	return new derived_t(*static_cast<const derived_t*>(other));
 }
 
 /*!
@@ -93,7 +93,7 @@ template <typename base_t, typename derived_t>
 constexpr typename std::enable_if<
 	std::is_base_of<base_t, derived_t>::value &&
 	!std::is_copy_constructible<derived_t>::value, void*>::type //Note the !
-	poly_copy(const void* const other) {
+	poly_copy(const void* other) {
 	throw std::runtime_error(
 		"attempting to copy-construct a non-copyable object");
 }
@@ -138,7 +138,7 @@ public:
 	using element_type = base_t;
 private:
 	std::unique_ptr<base_t> value;
-	void* (*copy_construct)(const void* const);
+	void* (*copy_construct)(const void*);
 public:
 	/*!
 	\brief   Access operator
@@ -255,7 +255,7 @@ public:
 	*/
 	poly& operator=(const poly& other);
 
-	//In the following 4 functions std::enable_if is used as a non-type template parameter,
+	//In the following 8 functions std::enable_if is used as a non-type template parameter,
 	//because of redefinition errors. See https://stackoverflow.com/q/36499008
 
 	/*!
