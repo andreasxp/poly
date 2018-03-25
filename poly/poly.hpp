@@ -137,9 +137,6 @@ class poly {
 public:
 	using element_type = base_t;
 private:
-	///Placeholder for default-constructed poly
-	struct invalid_type : base_t {};
-
 	std::unique_ptr<base_t> value;
 	void* (*copy_construct)(const void* const);
 public:
@@ -224,8 +221,8 @@ public:
 	/*!
 	\brief   Default constructor.
 	\details Since no object is being held inside, get_stored_type will evaluate to
-	         poly::invalid_type. is<poly::invalid_type> will evaluate to true, and
-			 using as<> to cast to any (meaningful) type will throw.
+	         nullptr. is<> will never evaluate to true, and
+			 using as<> to cast to any type will throw.
 	*/
 	constexpr poly();
 	
@@ -409,7 +406,7 @@ constexpr base_t * poly<base_t>::get() const {
 template<typename base_t>
 template<typename T>
 constexpr bool poly<base_t>::is() const {
-	return typeid(*value) == typeid(T);
+	return value.get() != nullptr && typeid(*value) == typeid(T);
 }
 
 template<typename base_t>
@@ -449,7 +446,7 @@ constexpr poly<base_t>::poly(derived_t* obj) :
 template<typename base_t>
 constexpr poly<base_t>::poly() :
 	value (nullptr),
-	copy_construct(&detail::poly_copy<base_t, invalid_type>) {
+	copy_construct(nullptr) {
 	POLY_ASSERT_POLYMORPHIC;
 }
 
