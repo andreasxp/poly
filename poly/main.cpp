@@ -32,6 +32,8 @@ int main() {
 		fac.add<B>();
 		
 		poly<A> var = fac.make("struct B");
+		poly<A> var2(var);
+		var2 = std::move(var);
 	}
 	catch (const std::exception& e) {
 		cout << e.what() << endl;
