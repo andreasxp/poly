@@ -13,20 +13,20 @@ struct Base {
 	virtual ~Base() = default;
 };
 
-struct Mid1 : Base {
+struct Mid1 : virtual Base {
 	int x;
 	Mid1() : x(2) {}
 	virtual ~Mid1() = default;
 };
 
-struct Mid2 : Base {
+struct Mid2 : virtual Base {
 	int y;
 
 	Mid2() : y(3) {}
 	virtual ~Mid2() = default;
 };
 
-struct Mid3 : Base {
+struct Mid3 : virtual Base {
 	int h;
 
 	Mid3() : h(3) {}
@@ -45,6 +45,8 @@ int main() {
 	try {
 		factory<Base> pf;
 		pf.add<Der>();
+
+		dynamic_cast<Base*>(new Der);
 
 		auto v1 = make_poly<Mid1, Der>();
 		poly<Mid3> v2 = v1;

@@ -46,13 +46,6 @@ SOFTWARE.
 #define POLY_TYPE_NAME(...) typeid(__VA_ARGS__).name()
 #endif
 
-/// Attribute for fake copy function
-#if __has_cpp_attribute(deprecated)
-#define POLY_UNUSED [[maybe_unused]]
-#else
-#define POLY_UNUSED
-#endif
-
 /// Namespace for all functions and classes, to not pollute global namespace
 namespace zhukov {
 
@@ -90,8 +83,6 @@ constexpr typename std::enable_if<
          derived_t **is not** Copy-Constructible.
 \tparam  base_t base class
 \tparam  derived_t derived_t class
-\param   other Pointer to derived_t, casted to void* for use in generic
-         function pointers
 \warning This function does not actually construct anything, and will throw
          upon calling.
 \throw   std::runtime_error Always.
@@ -100,7 +91,7 @@ template <typename base_t, typename derived_t>
 constexpr typename std::enable_if<
 	std::is_base_of<base_t, derived_t>::value &&
 	!std::is_copy_constructible<derived_t>::value, void*>::type //Note the !
-	poly_copy(const void* other POLY_UNUSED) {
+	poly_copy(const void* /*other (unused)*/) {
 	return throw std::runtime_error(
 		"attempting to copy-construct a non-copyable object");
 }
