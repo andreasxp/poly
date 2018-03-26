@@ -23,9 +23,13 @@ SOFTWARE.
 #ifndef POLY_HPP
 #define POLY_HPP
 
-#include <memory> // std::unique_ptr
-#include <typeinfo> // std::type_info
-#include <typeindex> // std::type_index
+#include <memory>      // unique_ptr
+#include <stdexcept>   // runtime_error
+#include <string>      // string
+#include <typeinfo>    // typeid, bad_cast
+#include <type_traits> // is_polymorphic, enable_if, is_base_of, 
+                       // is_copy_constructible
+#include <utility>     // forward
 
 /// Check if a type is polymorphic (and so can be used in poly)
 #define POLY_ASSERT_POLYMORPHIC static_assert(std::is_polymorphic<base_t>::value, "poly can only be used with polymorphic types");

@@ -23,9 +23,12 @@ SOFTWARE.
 #ifndef POLY_FACTORY_HPP
 #define POLY_FACTORY_HPP
 
-#include <unordered_map> // std::unordered_map
-#include <vector> // std::vector
-#include "poly.hpp" // zhukov::poly
+#include <unordered_map> // unordered_map
+#include <vector>        // vector
+#include <string>        // string
+#include <type_traits>   // enable_if, is_base_of, is_copy_constructible,
+                         // is_default_constructible
+#include "poly.hpp"
 
 ///Namespace for all functions and classes, to not pollute global namespace
 namespace zhukov {
