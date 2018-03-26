@@ -32,7 +32,9 @@ SOFTWARE.
 #include <utility>     // forward
 
 /// Check if a type is polymorphic (and so can be used in poly)
-#define POLY_ASSERT_POLYMORPHIC static_assert(std::is_polymorphic<base_t>::value, "poly can only be used with polymorphic types");
+#define POLY_ASSERT_POLYMORPHIC(type) \
+static_assert(std::is_polymorphic<type>::value, \
+	"poly can only be used with polymorphic types");
 
 /*!
 \brief   Macro to override typeid for rtti in poly
@@ -43,8 +45,8 @@ SOFTWARE.
 \example #define POLY_CUSTOM_RTTI(...) prettyid<__VA_ARGS__>().name();
 \see     https://github.com/andreasxp/pretty_index
 */
-#ifdef POLY_CUSTOM_RTTI
-#define POLY_TYPE_NAME POLY_CUSTOM_RTTI
+#ifdef POLY_CUSTOM_TYPE_NAME
+#define POLY_TYPE_NAME POLY_CUSTOM_TYPE_NAME
 #else
 /// Get name of type
 #define POLY_TYPE_NAME(...) typeid(__VA_ARGS__).name()
@@ -118,7 +120,11 @@ T try_downcast(U ptr) {
 	//Runtime check if the pointer can be down- or side-casted to a new base
 	if (ptr) {
 		T rslt = dynamic_cast<T>(ptr);
-		if (!rslt) throw std::runtime_error(std::string("unable to cast from '") + POLY_TYPE_NAME(U) + "' to '" + POLY_TYPE_NAME(T) + "'");
+		if (!rslt) throw std::runtime_error(
+			std::string("unable to cast from '")
+			+ POLY_TYPE_NAME(U)
+			+ "' to '"
+			+ POLY_TYPE_NAME(T) + "'");
 		return rslt;
 	}
 	return nullptr;
@@ -456,21 +462,21 @@ template<typename derived_t, typename Condition>
 constexpr poly<base_t>::poly(derived_t* obj) :
 	value(obj),
 	copy_construct(&detail::poly_copy<base_t, derived_t>) {
-	POLY_ASSERT_POLYMORPHIC;
+	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
 template<typename base_t>
 constexpr poly<base_t>::poly() :
 	value (nullptr),
 	copy_construct(nullptr) {
-	POLY_ASSERT_POLYMORPHIC;
+	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
 template<typename base_t>
 constexpr poly<base_t>::poly(const poly& other) :
 	value(static_cast<base_t*>(other.copy_construct(other.value.get()))),
 	copy_construct(other.copy_construct) {
-	POLY_ASSERT_POLYMORPHIC;
+	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
 template<typename base_t>
@@ -479,7 +485,7 @@ template <typename base2_t, typename std::enable_if<
 	constexpr poly<base_t>::poly(const poly<base2_t>& other) :
 	value(static_cast<base_t*>(other.copy_construct(other.value.get()))),
 	copy_construct(other.copy_construct) {
-	POLY_ASSERT_POLYMORPHIC;
+	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
 template<typename base_t>
@@ -487,7 +493,7 @@ template <typename base2_t, typename std::enable_if<
 	!std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
 	inline poly<base_t>::poly(const poly<base2_t>& other) :
 	poly() {
-	POLY_ASSERT_POLYMORPHIC;
+	POLY_ASSERT_POLYMORPHIC(base_t);
 
 	auto ptr = detail::try_downcast<base_t*>(other.value.get());
 	if (ptr) value.reset(static_cast<base_t*>(other.copy_construct(ptr)));
@@ -502,7 +508,7 @@ template <typename base2_t, typename std::enable_if<
 	constexpr poly<base_t>::poly(poly<base2_t>&& other) :
 	value(std::move(other.value)),
 	copy_construct(std::move(other.copy_construct)) {
-	POLY_ASSERT_POLYMORPHIC;
+	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
 template<typename base_t>
@@ -511,7 +517,7 @@ template <typename base2_t, typename std::enable_if<
 	inline poly<base_t>::poly(poly<base2_t>&& other) :
 	value(detail::try_downcast<base_t*>(other.value.release())),
 	copy_construct(std::move(other.copy_construct)) {
-	POLY_ASSERT_POLYMORPHIC;
+	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
 template<typename base_t>

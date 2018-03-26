@@ -46,7 +46,7 @@ int main() {
 		factory<Base> pf;
 		pf.add<Der>();
 
-		dynamic_cast<Base*>(new Der);
+		//poly<int> x;
 
 		auto v1 = make_poly<Mid1, Der>();
 		poly<Mid3> v2 = v1;
