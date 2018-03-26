@@ -6,6 +6,8 @@ To use `poly`, only a single file is required - `poly.hpp`. You can also use it 
 To use `poly`, your compiler must be up to ISO C++14 standard (It could work on C++11, testing is in progress, sorry!).
 ## How to use
 ### `poly.hpp`
+`poly.hpp` is a header for the class itself, `poly`. `poly` is a class that holds polymorphic objects as a ptr to their base class, but remembers the original class for safe copying, type examination and fast casting.
+`poly.hpp` contains full doxygen documentation.
 #### Include header:
 ```c++
 #include "poly.hpp"
@@ -31,9 +33,9 @@ Assume you have the following data structure:
 ```c++
 struct Animal;
 
-struct Mammal : Animal;
-struct Fish : Animal;
-struct Carnivorous : Animal;
+struct Mammal : virtual Animal;
+struct Fish : virtual Animal;
+struct Carnivorous : virtual Animal;
 
 struct Dog : Mammal, Carnivorous;
 struct Cow : Mammal;
@@ -50,6 +52,7 @@ poly<Dog>         poly_doggo = poly_mammal; //Down-cast mammal to Dog
 poly<Fish>        poly_fishy = poly_mammal; //Runtime exception (doggo is not a fish)
 ```
 ### `poly_factory.hpp`
+`poly_factory.hpp` contains class `factory`. `factory` lets you create poly by passing a string, representing the derived class. 
 #### Include header:
 ```c++
 #include "poly_factory.hpp"
@@ -57,7 +60,7 @@ poly<Fish>        poly_fishy = poly_mammal; //Runtime exception (doggo is not a 
 using zhukov::poly;
 using zhukov::factory;
 ```
-#### Create a `poly_factory`:
+#### Create a `factory`:
 ```c++
 factory<Animal> animal_farm;
 ```
@@ -71,7 +74,7 @@ animal_farm.add<Dog>;
 ```c++
 poly<Animal> doggo = animal_farm.make("Dog");
 ```
-*Note: Different compilers will require a diffrent string to create a class, depending on what typeid(Dog).name() returns. Consider using [some other rtti library](https://github.com/andreasxp/pretty_index) along with a POLY_CUSTOM_RTTI(type) macro for a cross-compiler result.*
+*Note: Different compilers will require a diffrent string to create a class, depending on what typeid(Dog).name() returns. Consider using [some other rtti library](https://github.com/andreasxp/pretty_index) along with defining POLY_CUSTOM_TYPE_NAME(type) macro before including for a cross-compiler result.*
 
 Source code contains extensive documentation on every class, method and macro in doxygen format.
 
