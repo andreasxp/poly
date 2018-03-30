@@ -60,44 +60,36 @@ namespace detail {
 //Black magic ahead
 
 /*!
-\brief   Wrapper for copy-constructor for derived_t class.
-\details Creates a copy of a derived_t object, which is stored in a base_t class 
-         ptr. This function is only enabled if base_t is base class of derived_t and 
-         derived_t **is** Copy-Constructible.
-\tparam  base_t base class
-\tparam  derived_t derived class
-\param   other Pointer to derived_t, casted to void* for use in generic
+\brief   Wrapper for a copy-constructor for class T.
+\details Creates a copy of the object, which is stored in a void ptr.
+         This function is only enabled if T **is** copy-constructible.
+\param   other Pointer to T, casted to void* for use in generic
          function pointers
 \warning This function performs **no checks** on whether the void* other
-         parameter is actually of type derived_t. Passing an invalid argument results in
+         parameter is actually of type T. Passing an invalid argument results in
          undefined behaviour.
-\return  A pointer to derived_t, casted to a void pointer.
+\return  A pointer to T, casted to a void pointer.
 \throw   std::bad_alloc If operator new fails to allocate memory
 */
-template <class base_t, class derived_t>
-constexpr typename std::enable_if<
-	std::is_base_of<base_t, derived_t>::value &&
-	std::is_copy_constructible<derived_t>::value, void*>::type
-	poly_copy(const void* other) {
-	return new derived_t(*static_cast<const derived_t*>(other));
+template <class T>
+typename std::enable_if<
+	std::is_copy_constructible<T>::value, void*>::type
+clone(const void* other) {
+	return new T(*static_cast<const T*>(other));
 }
 
 /*!
-\brief   Placeholder function for when copy-constructor of derived_t is deleted. 
-\details This is a placeholder, enabled only when real poly_copy is disabled. 
-         This function is only enabled if base_t is base class of derived_t and 
-         derived_t **is not** Copy-Constructible.
-\tparam  base_t base class
-\tparam  derived_t derived_t class
+\brief   Placeholder function for when copy-constructor of T is deleted. 
+\details This is a placeholder, enabled only when real clone() is disabled. 
+         This function is only enabled if T **is not** copy-constructible.
 \warning This function does not actually construct anything, and will throw
          upon calling.
 \throw   std::runtime_error Always.
 */
-template <class base_t, class derived_t>
-constexpr typename std::enable_if<
-	std::is_base_of<base_t, derived_t>::value &&
-	!std::is_copy_constructible<derived_t>::value, void*>::type //Note the !
-	poly_copy(const void* /*other (unused)*/) {
+template <class T>
+typename std::enable_if<
+	!std::is_copy_constructible<T>::value, void*>::type //Note the !
+clone(const void* /*other (unused)*/) {
 	return throw std::runtime_error(
 		"attempting to copy-construct a non-copyable object");
 }
@@ -461,7 +453,7 @@ template<class base_t>
 template<class derived_t, class>
 constexpr poly<base_t>::poly(derived_t* obj) :
 	value(obj),
-	copy_construct(&detail::poly_copy<base_t, derived_t>) {
+	copy_construct(&detail::clone<derived_t>) {
 	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
