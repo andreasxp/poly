@@ -74,7 +74,7 @@ namespace detail {
 \return  A pointer to derived_t, casted to a void pointer.
 \throw   std::bad_alloc If operator new fails to allocate memory
 */
-template <typename base_t, typename derived_t>
+template <class base_t, class derived_t>
 constexpr typename std::enable_if<
 	std::is_base_of<base_t, derived_t>::value &&
 	std::is_copy_constructible<derived_t>::value, void*>::type
@@ -93,7 +93,7 @@ constexpr typename std::enable_if<
          upon calling.
 \throw   std::runtime_error Always.
 */
-template <typename base_t, typename derived_t>
+template <class base_t, class derived_t>
 constexpr typename std::enable_if<
 	std::is_base_of<base_t, derived_t>::value &&
 	!std::is_copy_constructible<derived_t>::value, void*>::type //Note the !
@@ -115,7 +115,7 @@ constexpr typename std::enable_if<
 \return  T Casted pointer
 \throw   std::runtime_error If dynamic_cast failed
 */
-template <typename T, typename U>
+template <class T, class U>
 T try_downcast(U ptr) {
 	//Runtime check if the pointer can be down- or side-casted to a new base
 	if (ptr) {
@@ -140,7 +140,7 @@ T try_downcast(U ptr) {
 \tparam  base_t Class that all the objects must derive from
 \see     poly::as
 */
-template<typename base_t>
+template<class base_t>
 class poly {
 public:
 	using element_type = base_t;
@@ -195,7 +195,7 @@ public:
 	\tparam T Type to be checked against
 	\return **true** if object is of type T, **false** otherwise
 	*/
-	template <typename T>
+	template <class T>
 	constexpr bool is() const;
 	
 	/*!
@@ -207,7 +207,7 @@ public:
 	\throw   std::bad_cast if object is not exactly of type T
 	\see     is()
 	*/
-	template <typename T>
+	template <class T>
 	typename std::enable_if<
 		std::is_base_of<base_t, T>::value, T&>::type
 		as();
@@ -221,7 +221,7 @@ public:
 	\throw   std::bad_cast if object is not exactly of type T
 	\see     is()
 	*/
-	template <typename T>
+	template <class T>
 	constexpr typename std::enable_if<
 		std::is_base_of<base_t, T>::value, T&>::type
 		as() const;
@@ -241,7 +241,7 @@ public:
 	\tparam  derived_t Type of object to be constructed from.
 	\param   obj Pointer to the object
 	*/
-	template <typename derived_t, typename Condition = typename std::enable_if<
+	template <class derived_t, class = typename std::enable_if<
 		std::is_base_of<base_t, derived_t>::value>>
 		constexpr poly(derived_t* obj);
 
@@ -277,7 +277,7 @@ public:
 	\throw   std::runtime_error if internal object's copy constructor is
 	         deleted
 	*/
-	template <typename base2_t, typename std::enable_if<
+	template <class base2_t, typename std::enable_if<
 		std::is_base_of<base_t, base2_t>::value, base2_t>::type* = nullptr>
 		constexpr poly(const poly<base2_t>& other);
 
@@ -291,7 +291,7 @@ public:
 	         deleted
 	\throw   std::runtime_error if casting between selected types is impossible
 	*/
-	template <typename base2_t, typename std::enable_if<
+	template <class base2_t, typename std::enable_if<
 		!std::is_base_of<base_t, base2_t>::value, base2_t>::type* = nullptr>
 		poly(const poly<base2_t>& other);
 	
@@ -304,7 +304,7 @@ public:
 	\tparam  base2_t type of the poly being copied from.
 	\param   other poly to be copied
 	*/
-	template <typename base2_t, typename std::enable_if<
+	template <class base2_t, typename std::enable_if<
 		std::is_base_of<base_t, base2_t>::value, base2_t>::type* = nullptr>
 		constexpr poly(poly<base2_t>&& other);
 
@@ -316,7 +316,7 @@ public:
 	\param   other poly to be copied
 	\throw   std::runtime_error if casting between selected types is impossible
 	*/
-	template <typename base2_t, typename std::enable_if<
+	template <class base2_t, typename std::enable_if<
 		!std::is_base_of<base_t, base2_t>::value, base2_t>::type* = nullptr>
 		poly(poly<base2_t>&& other);
 
@@ -330,7 +330,7 @@ public:
 	\param   other poly to be copied
 	\throw   std::runtime_error if internal object's copy constructor is deleted
 	*/
-	template <typename base2_t, typename std::enable_if<
+	template <class base2_t, typename std::enable_if<
 		std::is_base_of<base_t, base2_t>::value, base2_t>::type* = nullptr>
 	poly& operator=(const poly<base2_t>& rhs);
 
@@ -343,7 +343,7 @@ public:
 	\throw   std::runtime_error if internal object's copy constructor is deleted
 	\throw   std::runtime_error if casting between selected types is impossible
 	*/
-	template <typename base2_t, typename std::enable_if<
+	template <class base2_t, typename std::enable_if<
 		!std::is_base_of<base_t, base2_t>::value, base2_t>::type* = nullptr>
 	poly& operator=(const poly<base2_t>& rhs);
 
@@ -356,7 +356,7 @@ public:
 	\tparam  base2_t type of the poly being copied from.
 	\param   rhs poly to be copied
 	*/
-	template <typename base2_t, typename std::enable_if<
+	template <class base2_t, typename std::enable_if<
 		std::is_base_of<base_t, base2_t>::value, base2_t>::type* = nullptr>
 	poly& operator=(poly<base2_t>&& rhs);
 
@@ -368,7 +368,7 @@ public:
 	\param   other poly to be copied
 	\throw   std::runtime_error if casting between selected types is impossible
 	*/
-	template <typename base2_t, typename std::enable_if<
+	template <class base2_t, typename std::enable_if<
 		!std::is_base_of<base_t, base2_t>::value, base2_t>::type* = nullptr>
 	poly& operator=(poly<base2_t>&& rhs);
 
@@ -377,7 +377,7 @@ public:
 
 	//Every poly is a friend of every other poly
 	//Like a big loving family! :)
-	template <typename base2_t>
+	template <class base2_t>
 	friend class poly;
 };
 
@@ -395,44 +395,44 @@ poly<base_t> make_poly(Args&&... args) {
 }
 
 // Definitions =================================================================
-template<typename base_t>
+template<class base_t>
 inline base_t & poly<base_t>::operator*() {
 	return *value;
 }
 
-template<typename base_t>
+template<class base_t>
 constexpr base_t & poly<base_t>::operator*() const {
 	return *value;
 }
 
-template<typename base_t>
+template<class base_t>
 inline base_t * poly<base_t>::operator->() {
 	return value.get();
 }
 
-template<typename base_t>
+template<class base_t>
 constexpr base_t * poly<base_t>::operator->() const {
 	return value.get();
 }
 
-template<typename base_t>
+template<class base_t>
 inline base_t * poly<base_t>::get() {
 	return value.get();
 }
 
-template<typename base_t>
+template<class base_t>
 constexpr base_t * poly<base_t>::get() const {
 	return value.get();
 }
 
-template<typename base_t>
-template<typename T>
+template<class base_t>
+template<class T>
 constexpr bool poly<base_t>::is() const {
 	return value.get() != nullptr && typeid(*value) == typeid(T);
 }
 
-template<typename base_t>
-template <typename T>
+template<class base_t>
+template<class T>
 typename std::enable_if<
 	std::is_base_of<base_t, T>::value, T&>::type
 	poly<base_t>::as() {
@@ -447,8 +447,8 @@ typename std::enable_if<
 		: throw std::bad_cast();*/
 }
 
-template<typename base_t>
-template <typename T>
+template<class base_t>
+template<class T>
 constexpr typename std::enable_if<
 	std::is_base_of<base_t, T>::value, T&>::type
 	poly<base_t>::as() const {
@@ -457,30 +457,30 @@ constexpr typename std::enable_if<
 		: throw std::bad_cast();
 }
 
-template<typename base_t>
-template<typename derived_t, typename Condition>
+template<class base_t>
+template<class derived_t, class>
 constexpr poly<base_t>::poly(derived_t* obj) :
 	value(obj),
 	copy_construct(&detail::poly_copy<base_t, derived_t>) {
 	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
-template<typename base_t>
+template<class base_t>
 constexpr poly<base_t>::poly() :
 	value (nullptr),
 	copy_construct(nullptr) {
 	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
-template<typename base_t>
+template<class base_t>
 constexpr poly<base_t>::poly(const poly& other) :
 	value(static_cast<base_t*>(other.copy_construct(other.value.get()))),
 	copy_construct(other.copy_construct) {
 	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
-template<typename base_t>
-template <typename base2_t, typename std::enable_if<
+template<class base_t>
+template<class base2_t, typename std::enable_if<
 	std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
 	constexpr poly<base_t>::poly(const poly<base2_t>& other) :
 	value(static_cast<base_t*>(other.copy_construct(other.value.get()))),
@@ -488,8 +488,8 @@ template <typename base2_t, typename std::enable_if<
 	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
-template<typename base_t>
-template <typename base2_t, typename std::enable_if<
+template<class base_t>
+template<class base2_t, typename std::enable_if<
 	!std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
 	inline poly<base_t>::poly(const poly<base2_t>& other) :
 	poly() {
@@ -502,8 +502,8 @@ template <typename base2_t, typename std::enable_if<
 	copy_construct = other.copy_construct;
 }
 
-template<typename base_t>
-template <typename base2_t, typename std::enable_if<
+template<class base_t>
+template<class base2_t, typename std::enable_if<
 	std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
 	constexpr poly<base_t>::poly(poly<base2_t>&& other) :
 	value(std::move(other.value)),
@@ -511,8 +511,8 @@ template <typename base2_t, typename std::enable_if<
 	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
-template<typename base_t>
-template <typename base2_t, typename std::enable_if<
+template<class base_t>
+template<class base2_t, typename std::enable_if<
 	!std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
 	inline poly<base_t>::poly(poly<base2_t>&& other) :
 	value(detail::try_downcast<base_t*>(other.value.release())),
@@ -520,23 +520,25 @@ template <typename base2_t, typename std::enable_if<
 	POLY_ASSERT_POLYMORPHIC(base_t);
 }
 
-template<typename base_t>
+template<class base_t>
 inline poly<base_t> & poly<base_t>::operator=(const poly& rhs) {
 	value.reset(static_cast<base_t*>(rhs.copy_construct(rhs.value.get())));
 	copy_construct = rhs.copy_construct;
 	return *this;
 }
 
-template<typename base_t>
-template<typename base2_t, typename std::enable_if<std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
+template<class base_t>
+template<class base2_t, typename std::enable_if<
+	std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
 inline poly<base_t> & poly<base_t>::operator=(const poly<base2_t>& rhs) {
 	value = static_cast<base_t*>(rhs.copy_construct(rhs.value.get()));
 	copy_construct = rhs.copy_construct;
 	return *this;
 }
 
-template<typename base_t>
-template<typename base2_t, typename std::enable_if<!std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
+template<class base_t>
+template<class base2_t, typename std::enable_if<
+	!std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
 inline poly<base_t> & poly<base_t>::operator=(const poly<base2_t>& rhs) {
 	auto ptr = detail::try_downcast<base_t*>(rhs.value.get());
 	if (ptr) value.reset(static_cast<base_t*>(rhs.copy_construct(ptr)));
@@ -546,16 +548,18 @@ inline poly<base_t> & poly<base_t>::operator=(const poly<base2_t>& rhs) {
 	return *this;
 }
 
-template<typename base_t>
-template<typename base2_t, typename std::enable_if<std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
+template<class base_t>
+template<class base2_t, typename std::enable_if<
+	std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
 inline poly<base_t> & poly<base_t>::operator=(poly<base2_t>&& rhs) {
 	value = std::move(rhs.value);
 	copy_construct = std::move(rhs.copy_construct);
 	return *this;
 }
 
-template<typename base_t>
-template<typename base2_t, typename std::enable_if<!std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
+template<class base_t>
+template<class base2_t, typename std::enable_if<
+	!std::is_base_of<base_t, base2_t>::value, base2_t>::type*>
 inline poly<base_t> & poly<base_t>::operator=(poly<base2_t>&& rhs) {
 	value.reset(detail::try_downcast<base_t*>(rhs.value.release()));
 	copy_construct = std::move(rhs.copy_construct);

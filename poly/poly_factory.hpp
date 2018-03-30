@@ -43,7 +43,7 @@ namespace detail {
 \tparam  base_t base type
 \tparam  derived_t  type of which a default-ctor will be invoked
 */
-template <typename base_t, typename derived_t>
+template <class base_t, class derived_t>
 constexpr typename std::enable_if<std::is_base_of<base_t, derived_t>::value && std::is_default_constructible<derived_t>::value, poly<base_t>>::type
 make_impl() {
 	return poly<base_t>(new derived_t);
@@ -57,7 +57,7 @@ make_impl() {
          make poly<> from just passing string("type").
 \tparam  base_t what to store built objects in
 */
-template <typename base_t>
+template <class base_t>
 class factory {
 private:
 	std::unordered_map<std::string, poly<base_t>(*)()> make_funcs;
@@ -66,7 +66,7 @@ public:
 	\brief   Add a class to factory, so it can be created by a string
 	\tparam  derived_t Type to register. Must be derived from base_t.
 	*/
-	template <typename derived_t>
+	template <class derived_t>
 	constexpr typename std::enable_if<std::is_base_of<base_t, derived_t>::value && std::is_default_constructible<derived_t>::value, void>::type
 		add();
 
@@ -80,14 +80,14 @@ public:
 	poly<base_t> make(const std::string& name) const;
 };
 
-template<typename base_t>
-template<typename derived_t>
+template<class base_t>
+template<class derived_t>
 constexpr typename std::enable_if<std::is_base_of<base_t, derived_t>::value && std::is_default_constructible<derived_t>::value, void>::type
 factory<base_t>::add() {
 	make_funcs[POLY_TYPE_NAME(derived_t)] = &detail::make_impl<base_t, derived_t>;
 }
 
-template<typename base_t>
+template<class base_t>
 inline std::vector<std::string> factory<base_t>::list() const {
 	std::vector<std::string> rslt;
 
@@ -98,7 +98,7 @@ inline std::vector<std::string> factory<base_t>::list() const {
 	return rslt;
 }
 
-template<typename base_t>
+template<class base_t>
 inline poly<base_t> factory<base_t>::make(const std::string& name) const {
 	return make_funcs.at(name)();
 }
