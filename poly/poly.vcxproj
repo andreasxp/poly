@@ -129,6 +129,10 @@
     <ClInclude Include="poly.hpp" />
     <ClInclude Include="poly_factory.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="poly.inl" />
+    <None Include="poly_factory.inl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
