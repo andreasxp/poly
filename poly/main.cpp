@@ -48,10 +48,14 @@ int main() {
 
 		//poly<int> x;
 
-		auto v1 = make_poly<Mid1, Der>();
-		poly<Mid3> v2 = v1;
+		poly<Base> p;
+		auto p2 = p;
 
-		cout << v2->h;
+		auto v1 = make_poly<Mid1, Der>();
+		auto v2 = transform_poly<Mid2, Der>(v1);
+		//poly<Mid3> v2 = transform_poly<Mid3, Der>(v1);
+
+		cout << v2->y;
 	}
 	catch (const std::exception& e) {
 		cout << e.what() << endl;
