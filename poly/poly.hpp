@@ -35,10 +35,10 @@ public:
 
 	// Construction ============================================================
 	// Default, copy, move -----------------------------------------------------
-	constexpr poly();
-	constexpr poly(std::nullptr_t);
+	constexpr poly() noexcept;
+	constexpr poly(std::nullptr_t) noexcept;
 	constexpr poly(const poly& other);
-	constexpr poly(poly&& other);
+	constexpr poly(poly&& other) noexcept;
 	poly& operator=(poly other);
 
 	// From a pointer ----------------------------------------------------------
@@ -51,7 +51,7 @@ public:
 
 	// Observers ===============================================================
 	template <class T>
-	constexpr bool is() const;
+	constexpr bool is() const noexcept;
 
 	explicit operator bool() const noexcept;
 
@@ -83,7 +83,7 @@ public:
 		as() const;
 
 	// Friends =================================================================
-	friend void swap(poly& lhs, poly& rhs);
+	friend void swap(poly& lhs, poly& rhs) noexcept;
 
 private:
 	void* derived_ptr; // points to derived

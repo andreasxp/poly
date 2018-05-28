@@ -41,7 +41,7 @@ typename std::enable_if<
 // Default, copy, move -----------------------------------------------------
 
 template<class base_t>
-constexpr poly<base_t>::poly() :
+constexpr poly<base_t>::poly() noexcept :
 	derived_ptr(nullptr),
 	base_ptr(nullptr),
 	copy_construct(nullptr) {
@@ -50,7 +50,7 @@ constexpr poly<base_t>::poly() :
 }
 
 template<class base_t>
-constexpr poly<base_t>::poly(std::nullptr_t) :
+constexpr poly<base_t>::poly(std::nullptr_t) noexcept :
 	poly() {
 }
 
@@ -69,7 +69,7 @@ constexpr poly<base_t>::poly(const poly& other) :
 }
 
 template<class base_t>
-inline constexpr poly<base_t>::poly(poly && other) :
+inline constexpr poly<base_t>::poly(poly && other) noexcept :
 	poly() {
 	swap(*this, other);
 }
@@ -94,7 +94,7 @@ constexpr poly<base_t>::poly(derived_t* obj) :
 // Observers ===============================================================
 template<class base_t>
 template<class T>
-constexpr bool poly<base_t>::is() const {
+constexpr bool poly<base_t>::is() const noexcept {
 	return base_ptr.get() != nullptr && typeid(*base_ptr) == typeid(T);
 }
 
@@ -183,7 +183,7 @@ constexpr typename std::enable_if<
 }
 
 template<class base_t>
-void swap(poly<base_t>& lhs, poly<base_t>& rhs) {
+void swap(poly<base_t>& lhs, poly<base_t>& rhs) noexcept {
 	using std::swap;
 
 	swap(lhs.derived_ptr, rhs.derived_ptr);
