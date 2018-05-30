@@ -10,20 +10,20 @@
 ///Namespace for all functions and classes, to not pollute global namespace
 namespace zhukov {
 
-template <class base_t>
+template <class Base>
 class factory {
 public:
-	template <class derived_t>
+	template <class Derived>
 	constexpr typename std::enable_if<
-		std::is_base_of<base_t, derived_t>::value && 
-		std::is_default_constructible<derived_t>::value, void>::type
+		std::is_base_of<Base, Derived>::value && 
+		std::is_default_constructible<Derived>::value, void>::type
 		add();
 	
 	std::vector<std::string> list() const;
-	poly<base_t> make(const std::string& name) const;
+	poly<Base> make(const std::string& name) const;
 
 private:
-	std::unordered_map<std::string, poly<base_t>(*)()> make_funcs;
+	std::unordered_map<std::string, poly<Base>(*)()> make_funcs;
 };
 
 } // namespace zhukov

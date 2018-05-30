@@ -32,12 +32,18 @@
     <ClInclude Include="tests.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="poly_ptr.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="poly.inl">
+    <None Include="poly_factory.inl">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="poly_factory.inl">
+    <None Include="poly_ptr.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="poly.inl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

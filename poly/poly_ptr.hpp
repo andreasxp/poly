@@ -29,88 +29,80 @@
 namespace zhukov {
 
 template<class Base>
-class poly {
+class poly_ptr {
 public:
+	using pointer = Base*;
 	using element_type = Base;
 
 	// Construction ============================================================
 	// Default, copy, move -----------------------------------------------------
-	constexpr poly() noexcept;
-	constexpr poly(std::nullptr_t) noexcept;
-	constexpr poly(const poly& other);
-	constexpr poly(poly&& other) noexcept;
-	poly& operator=(poly other);
+	constexpr poly_ptr() noexcept;
+	constexpr poly_ptr(std::nullptr_t) noexcept;
+	constexpr poly_ptr(poly_ptr&& other) noexcept;
+	constexpr poly_ptr& operator=(poly_ptr&& other) noexcept;
+	constexpr poly_ptr& operator=(std::nullptr_t) noexcept;
 
 	// From a pointer ----------------------------------------------------------
 	template <class Derived, class = typename std::enable_if<
 		std::is_base_of<Base, Derived>::value>>
-		constexpr poly(Derived* obj);
+		explicit constexpr poly_ptr(Derived* obj);
 
 	// Destruction -------------------------------------------------------------
-	~poly() = default;
+	~poly_ptr() = default;
 
 	// Observers ===============================================================
 	template <class T>
 	constexpr bool is() const noexcept;
 
-	explicit operator bool() const noexcept;
+	explicit constexpr operator bool() const noexcept;
 
 	// Modifiers ===============================================================
-	Base* release() noexcept;
-	void reset() noexcept;
+	pointer release() noexcept;
+	void reset(std::nullptr_t = nullptr) noexcept;
 	template <class Derived, class = typename std::enable_if<
 		std::is_base_of<Base, Derived>::value>>
-		void reset(Derived* obj);
+		void reset(Derived* obj) noexcept;
+
+	void swap(poly_ptr& other) noexcept;
 
 	// Member access ===========================================================
-	Base& operator*();
-	constexpr Base& operator*() const;
-
-	Base* operator->();
-	constexpr Base* operator->() const;
-
-	Base* get();
-	constexpr Base* get() const;
+	Base& operator*() const;
+	pointer operator->() const noexcept;
+	pointer get() const noexcept;
 
 	template <class T>
 	typename 
-		std::enable_if<std::is_base_of<Base, T>::value, T&>::type
+		std::enable_if<std::is_base_of<Base, T>::value, T*>::type
 		as();
 
 	template <class T>
 	constexpr typename 
-		std::enable_if<std::is_base_of<Base, T>::value, T&>::type
+		std::enable_if<std::is_base_of<Base, T>::value, T*>::type
 		as() const;
-
-	// Friends =================================================================
-	template <class T>
-	friend void swap(poly<T>& lhs, poly<T>& rhs) noexcept;
 
 private:
 	void* derived_ptr; // points to derived
 	std::unique_ptr<Base> base_ptr; // points to base
-
-	std::pair<void*, void*> (*copy_construct)(const void*);
 };
 
 template <class Base, class Derived, class... Args>
-poly<Base> make_poly(Args&&... args) {
-	return poly<Base>(new Derived(std::forward<Args>(args)...));
+poly_ptr<Base> make_poly_ptr(Args&&... args) {
+	return poly_ptr<Base>(new Derived(std::forward<Args>(args)...));
 }
 
 template <class new_base_t, class Derived, class old_base_t>
-poly<new_base_t> transform_poly(const poly<old_base_t>& other) {
-	Derived* new_ptr = new Derived(other.as<Derived>());
-	return poly<new_base_t>(new_ptr);
+poly_ptr<new_base_t> transform_poly_ptr(const poly_ptr<old_base_t>& other) {
+	Derived* new_ptr = new Derived(*other.as<Derived>());
+	return poly_ptr<new_base_t>(new_ptr);
 }
 
 template <class new_base_t, class Derived, class old_base_t>
-poly<new_base_t> transform_poly(poly<old_base_t>&& other) {
+poly_ptr<new_base_t> transform_poly_ptr(poly_ptr<old_base_t>&& other) {
 	Derived* new_ptr = other.as<Derived>();
 	other.reset();
-	return poly<new_base_t>(new_ptr);
+	return poly_ptr<new_base_t>(new_ptr);
 }
 
 } // namespace zhukov
 
-#include "poly.inl"
+#include "poly_ptr.inl"

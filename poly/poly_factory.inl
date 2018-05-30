@@ -6,25 +6,25 @@ namespace zhukov {
 
 ///Namespace for internal-use-only functions
 namespace detail {
-template <class base_t, class derived_t>
+template <class Base, class Derived>
 constexpr typename
-std::enable_if<std::is_base_of<base_t, derived_t>::value &&
-	std::is_default_constructible<derived_t>::value, poly<base_t>>::type
+std::enable_if<std::is_base_of<Base, Derived>::value &&
+	std::is_default_constructible<Derived>::value, poly<Base>>::type
 	make_impl() {
-	return poly<base_t>(new derived_t());
+	return poly<Base>(new Derived());
 }
 
 } // namespace detail
 
-template<class base_t>
-template<class derived_t>
-constexpr typename std::enable_if<std::is_base_of<base_t, derived_t>::value && std::is_default_constructible<derived_t>::value, void>::type
-factory<base_t>::add() {
-	make_funcs[POLY_TYPE_NAME(derived_t)] = &detail::make_impl<base_t, derived_t>;
+template<class Base>
+template<class Derived>
+constexpr typename std::enable_if<std::is_base_of<Base, Derived>::value && std::is_default_constructible<Derived>::value, void>::type
+factory<Base>::add() {
+	make_funcs[POLY_TYPE_NAME(Derived)] = &detail::make_impl<Base, Derived>;
 }
 
-template<class base_t>
-inline std::vector<std::string> factory<base_t>::list() const {
+template<class Base>
+inline std::vector<std::string> factory<Base>::list() const {
 	std::vector<std::string> rslt;
 
 	for (auto&& it : make_funcs) {
@@ -34,8 +34,8 @@ inline std::vector<std::string> factory<base_t>::list() const {
 	return rslt;
 }
 
-template<class base_t>
-inline poly<base_t> factory<base_t>::make(const std::string& name) const {
+template<class Base>
+inline poly<Base> factory<Base>::make(const std::string& name) const {
 	return make_funcs.at(name)();
 }
 
