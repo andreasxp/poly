@@ -83,7 +83,8 @@ public:
 		as() const;
 
 	// Friends =================================================================
-	friend void swap(poly& lhs, poly& rhs) noexcept;
+	template <class T>
+	friend void swap(poly<T>& lhs, poly<T>& rhs) noexcept;
 
 private:
 	void* derived_ptr; // points to derived

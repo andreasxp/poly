@@ -124,10 +124,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="poly.hpp" />
     <ClInclude Include="poly_factory.hpp" />
+    <ClInclude Include="tests.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="poly.inl" />

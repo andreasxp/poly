@@ -61,7 +61,7 @@ constexpr poly<base_t>::poly(const poly& other) :
 	copy_construct(other.copy_construct) {
 
 	if (other) {
-		auto copy_result = copy_construct(other.base_ptr.get());
+		auto copy_result = copy_construct(other.derived_ptr);
 
 		base_ptr.reset(static_cast<base_t*>(copy_result.first));
 		derived_ptr = copy_result.second;
@@ -95,7 +95,7 @@ constexpr poly<base_t>::poly(derived_t* obj) :
 template<class base_t>
 template<class T>
 constexpr bool poly<base_t>::is() const noexcept {
-	return base_ptr.get() != nullptr && typeid(*base_ptr) == typeid(T);
+	return base_ptr.get() != nullptr && typeid(*base_ptr.get()) == typeid(T);
 }
 
 template<class base_t>
