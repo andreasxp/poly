@@ -69,20 +69,16 @@ inline poly<Base>& poly<Base>::operator=(const poly& other) {
 
 template<class Base>
 template<class Derived, class>
-inline constexpr poly<Base>::poly(const Derived& obj) :
+constexpr poly<Base>::poly(const Derived& obj) :
 	data(new Derived(obj)),
 	copy_construct(&detail::clone<Base, Derived>) {
-	static_assert(std::is_base_of<Base, Derived>::value,
-		"poly: poly can only be built using types, derived from Base");
 }
 
 template<class Base>
 template<class Derived, class>
-inline constexpr poly<Base>::poly(Derived&& obj) :
+constexpr poly<Base>::poly(Derived&& obj) :
 	data(new Derived(std::move(obj))),
 	copy_construct(&detail::clone<Base, Derived>) {
-	static_assert(std::is_base_of<Base, Derived>::value,
-		"poly: poly can only be built using types, derived from Base");
 }
 
 // Observers ===============================================================

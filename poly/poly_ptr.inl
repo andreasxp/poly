@@ -40,9 +40,12 @@ constexpr poly_ptr<Base>& poly_ptr<Base>::operator=(std::nullptr_t) noexcept {
 
 // From a pointer ----------------------------------------------------------
 template<class Base>
-template<class Derived, class>
+template<class Derived>
 constexpr poly_ptr<Base>::poly_ptr(Derived* obj) :
 	base_ptr(static_cast<Base*>(obj)) {
+	static_assert(std::is_base_of<Base, Derived>::value,
+		"poly_ptr: poly_ptr can only be built using types, derived from Base");
+
 	detail::polymorphic_traits<Base, Derived>::offset = 
 		reinterpret_cast<unsigned char*>(obj) - 
 		reinterpret_cast<unsigned char*>(base_ptr.get());
@@ -76,8 +79,11 @@ inline void poly_ptr<Base>::reset(std::nullptr_t) noexcept {
 }
 
 template<class Base>
-template<class Derived, class>
+template<class Derived>
 inline void poly_ptr<Base>::reset(Derived* obj) noexcept {
+	static_assert(std::is_base_of<Base, Derived>::value,
+		"poly_ptr: poly_ptr can only be built using types, derived from Base");
+
 	base_ptr.reset(obj);
 
 	detail::polymorphic_traits<Base, Derived>::offset =
@@ -112,9 +118,9 @@ poly_ptr<Base>::get() const noexcept {
 
 template<class Base>
 template<class T>
-typename std::enable_if<
-	std::is_base_of<Base, T>::value, T*>::type
-	poly_ptr<Base>::as() const noexcept {
+T* poly_ptr<Base>::as() const noexcept {
+	static_assert(std::is_base_of<Base, T>::value,
+		"poly_ptr: cannot interpret as class not derived from Base");
 
 	if (is<T>()) {
 		return detail::polymorphic_traits<Base, T>::downcast(base_ptr.get());

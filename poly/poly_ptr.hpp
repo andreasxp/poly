@@ -28,9 +28,8 @@ public:
 	poly_ptr& operator=(const poly_ptr&) = delete;
 
 	// From a pointer ----------------------------------------------------------
-	template <class Derived, class = typename std::enable_if<
-		std::is_base_of<Base, Derived>::value>>
-		explicit constexpr poly_ptr(Derived* obj);
+	template <class Derived>
+	explicit constexpr poly_ptr(Derived* obj);
 
 	// Destruction -------------------------------------------------------------
 	~poly_ptr() = default;
@@ -44,9 +43,9 @@ public:
 	// Modifiers ===============================================================
 	pointer release() noexcept;
 	void reset(std::nullptr_t = nullptr) noexcept;
-	template <class Derived, class = typename std::enable_if<
-		std::is_base_of<Base, Derived>::value>>
-		void reset(Derived* obj) noexcept;
+
+	template <class Derived>
+	void reset(Derived* obj) noexcept;
 
 	void swap(poly_ptr& other) noexcept;
 
@@ -56,8 +55,7 @@ public:
 	pointer get() const noexcept;
 
 	template <class T>
-	typename std::enable_if<std::is_base_of<Base, T>::value, T*>::type
-		as() const noexcept;
+	T* as() const noexcept;
 
 private:
 	std::unique_ptr<Base> base_ptr;

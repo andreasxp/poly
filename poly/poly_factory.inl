@@ -5,8 +5,7 @@ namespace zhukov {
 
 template<class Base>
 template<class Derived>
-constexpr typename std::enable_if<std::is_base_of<Base, Derived>::value && std::is_default_constructible<Derived>::value, void>::type
-factory<Base>::add() {
+void factory<Base>::add() {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly_factory: factory can only build types, derived from Base");
 	static_assert(std::is_default_constructible<Derived>::value,

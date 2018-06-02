@@ -7,7 +7,6 @@
                          // is_default_constructible
 #include "poly.hpp"
 
-///Namespace for all functions and classes, to not pollute global namespace
 namespace zhukov {
 
 template <class Base>
@@ -16,10 +15,7 @@ class factory {
 		"poly_factory: factory can only be used with polymorphic types");
 public:
 	template <class Derived>
-	constexpr typename std::enable_if<
-		std::is_base_of<Base, Derived>::value && 
-		std::is_default_constructible<Derived>::value, void>::type
-		add();
+	void add();
 	
 	std::vector<std::string> list() const;
 	poly<Base> make(const std::string& name) const;
