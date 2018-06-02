@@ -12,6 +12,8 @@ namespace zhukov {
 
 template <class Base>
 class factory {
+	static_assert(std::is_polymorphic<Base>::value,
+		"poly_factory: factory can only be used with polymorphic types");
 public:
 	template <class Derived>
 	constexpr typename std::enable_if<

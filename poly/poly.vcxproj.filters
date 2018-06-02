@@ -35,6 +35,9 @@
     <ClInclude Include="poly_ptr.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="polymorphic_traits.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="poly_factory.inl">
@@ -44,6 +47,9 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="poly.inl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="polymorphic_traits.inl">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

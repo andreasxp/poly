@@ -1,26 +1,18 @@
 #pragma once
 #include "poly_factory.hpp"
 
-///Namespace for all functions and classes, to not pollute global namespace
 namespace zhukov {
-
-///Namespace for internal-use-only functions
-namespace detail {
-template <class Base, class Derived>
-constexpr typename
-std::enable_if<std::is_base_of<Base, Derived>::value &&
-	std::is_default_constructible<Derived>::value, poly<Base>>::type
-	make_impl() {
-	return poly<Base>(new Derived());
-}
-
-} // namespace detail
 
 template<class Base>
 template<class Derived>
 constexpr typename std::enable_if<std::is_base_of<Base, Derived>::value && std::is_default_constructible<Derived>::value, void>::type
 factory<Base>::add() {
-	make_funcs[POLY_TYPE_NAME(Derived)] = &detail::make_impl<Base, Derived>;
+	static_assert(std::is_base_of<Base, Derived>::value,
+		"poly_factory: factory can only build types, derived from Base");
+	static_assert(std::is_default_constructible<Derived>::value,
+		"poly_factory: factory can only build default-constructible types");
+
+	make_funcs[POLY_TYPE_NAME(Derived)] = &make_poly<Base, Derived>;
 }
 
 template<class Base>

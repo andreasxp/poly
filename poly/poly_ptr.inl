@@ -1,5 +1,6 @@
 #pragma once
 #include "poly_ptr.hpp"
+#include "polymorphic_traits.hpp"
 
 namespace zhukov {
 
@@ -11,10 +12,7 @@ namespace zhukov {
 
 template<class Base>
 constexpr poly_ptr<Base>::poly_ptr() noexcept :
-	derived_ptr(nullptr),
 	base_ptr(nullptr) {
-	static_assert(std::is_polymorphic<Base>::value,
-		"poly_ptr: poly_ptr can only be used with polymorphic types");
 }
 
 template<class Base>
@@ -25,17 +23,17 @@ constexpr poly_ptr<Base>::poly_ptr(std::nullptr_t) noexcept :
 template<class Base>
 constexpr poly_ptr<Base>::poly_ptr(poly_ptr&& other) noexcept :
 	poly_ptr() {
-	swap(*this, other);
+	swap(other);
 }
 
 template<class Base>
-constexpr poly_ptr<Base> & poly_ptr<Base>::operator=(poly_ptr&& other) {
-	swap(*this, other);
+constexpr poly_ptr<Base>& poly_ptr<Base>::operator=(poly_ptr&& other) noexcept {
+	swap(other);
 	return *this;
 }
 
 template<class Base>
-constexpr poly_ptr<Base> & poly_ptr<Base>::operator=(std::nullptr_t) {
+constexpr poly_ptr<Base>& poly_ptr<Base>::operator=(std::nullptr_t) noexcept {
 	reset();
 	return *this;
 }
@@ -44,10 +42,10 @@ constexpr poly_ptr<Base> & poly_ptr<Base>::operator=(std::nullptr_t) {
 template<class Base>
 template<class Derived, class>
 constexpr poly_ptr<Base>::poly_ptr(Derived* obj) :
-	derived_ptr(obj),
 	base_ptr(static_cast<Base*>(obj)) {
-	static_assert(std::is_polymorphic<Base>::value,
-		"poly_ptr: poly_ptr can only be used with polymorphic types");
+	detail::polymorphic_traits<Base, Derived>::offset = 
+		reinterpret_cast<unsigned char*>(obj) - 
+		reinterpret_cast<unsigned char*>(base_ptr.get());
 }
 
 // Observers ===============================================================
@@ -74,28 +72,23 @@ poly_ptr<Base>::release() noexcept {
 
 template<class Base>
 inline void poly_ptr<Base>::reset(std::nullptr_t) noexcept {
-	reset();
-}
-
-template<class Base>
-inline void poly_ptr<Base>::reset() noexcept {
 	base_ptr.reset();
-	derived_ptr = nullptr;
-	copy_construct = nullptr;
 }
 
 template<class Base>
 template<class Derived, class>
-inline void poly_ptr<Base>::reset(Derived* obj) {
-	derived_ptr = obj;
+inline void poly_ptr<Base>::reset(Derived* obj) noexcept {
 	base_ptr.reset(obj);
+
+	detail::polymorphic_traits<Base, Derived>::offset =
+		reinterpret_cast<unsigned char*>(obj) -
+		reinterpret_cast<unsigned char*>(base_ptr.get());
 }
 
 template<class Base>
 inline void poly_ptr<Base>::swap(poly_ptr& other) noexcept {
 	using std::swap;
 
-	swap(derived_ptr, other.derived_ptr);
 	swap(base_ptr, other.base_ptr);
 }
 
@@ -107,13 +100,13 @@ inline Base& poly_ptr<Base>::operator*() const {
 
 template<class Base>
 inline typename poly_ptr<Base>::pointer
-poly_ptr<Base>::operator->() const {
+poly_ptr<Base>::operator->() const noexcept {
 	return base_ptr.get();
 }
 
 template<class Base>
 inline typename poly_ptr<Base>::pointer
-poly_ptr<Base>::get() const {
+poly_ptr<Base>::get() const noexcept {
 	return base_ptr.get();
 }
 
@@ -121,24 +114,12 @@ template<class Base>
 template<class T>
 typename std::enable_if<
 	std::is_base_of<Base, T>::value, T*>::type
-	poly_ptr<Base>::as() {
+	poly_ptr<Base>::as() const noexcept {
 
 	if (is<T>()) {
-		return *static_cast<T*>(derived_ptr);
+		return detail::polymorphic_traits<Base, T>::downcast(base_ptr.get());
 	}
-	throw std::bad_cast();
-}
-
-template<class Base>
-template<class T>
-constexpr typename std::enable_if<
-	std::is_base_of<Base, T>::value, T&>::type
-	poly_ptr<Base>::as() const {
-
-	if (is<T>()) {
-		return *static_cast<T*>(derived_ptr);
-	}
-	throw std::bad_cast();
+	return nullptr;
 }
 
 template<class Base>

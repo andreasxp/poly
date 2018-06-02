@@ -9,42 +9,34 @@
                        // is_copy_constructible
 #include <utility>     // forward
 
-/*!
-\brief   Macro to override typeid for rtti in poly
-\details Define POLY_CUSTOM_RTTI(type) as a function that returns
-         your type's name. Do this **before** including poly.hpp
-		 or poly_factory.hpp. 
-\example #define POLY_CUSTOM_RTTI(...) my_typeid(__VA_ARGS__).name();
-\example #define POLY_CUSTOM_RTTI(...) prid<__VA_ARGS__>().name();
-\see     https://github.com/andreasxp/prindex
-*/
-#ifdef POLY_CUSTOM_TYPE_NAME
-#define POLY_TYPE_NAME POLY_CUSTOM_TYPE_NAME
-#else
-/// Get name of type
-#define POLY_TYPE_NAME(...) typeid(__VA_ARGS__).name()
-#endif
+#include "polymorphic_traits.hpp"
 
 /// Namespace for all functions and classes, to not pollute global namespace
 namespace zhukov {
 
 template<class Base>
 class poly {
+	static_assert(std::is_polymorphic<Base>::value,
+		"poly: poly can only be used with polymorphic types");
 public:
-	using element_type = Base;
+	using type = Base;
 
 	// Construction ============================================================
 	// Default, copy, move -----------------------------------------------------
 	constexpr poly() noexcept;
-	constexpr poly(std::nullptr_t) noexcept;
 	constexpr poly(const poly& other);
-	constexpr poly(poly&& other) noexcept;
-	poly& operator=(poly other);
+	constexpr poly(poly&&) noexcept = default;
+	poly& operator=(const poly& other);
+	poly& operator=(poly&&) noexcept = default;
 
-	// From a pointer ----------------------------------------------------------
+	// From an object ----------------------------------------------------------
 	template <class Derived, class = typename std::enable_if<
-		std::is_base_of<Base, Derived>::value>>
-		constexpr poly(Derived* obj);
+		std::is_base_of<Base, Derived>::value>::type>
+	explicit constexpr poly(const Derived& obj);
+
+	template <class Derived, class = typename std::enable_if<
+		std::is_base_of<Base, Derived>::value>::type>
+	explicit constexpr poly(Derived&& obj);
 
 	// Destruction -------------------------------------------------------------
 	~poly() = default;
@@ -55,60 +47,38 @@ public:
 
 	explicit operator bool() const noexcept;
 
-	// Modifiers ===============================================================
-	Base* release() noexcept;
-	void reset() noexcept;
-	template <class Derived, class = typename std::enable_if<
-		std::is_base_of<Base, Derived>::value>>
-		void reset(Derived* obj);
-
 	// Member access ===========================================================
-	Base& operator*();
-	constexpr Base& operator*() const;
+	operator Base&();
+	operator const Base&() const;
 
-	Base* operator->();
-	constexpr Base* operator->() const;
-
-	Base* get();
-	constexpr Base* get() const;
+	Base& get();
+	const Base& get() const;
 
 	template <class T>
-	typename 
-		std::enable_if<std::is_base_of<Base, T>::value, T&>::type
-		as();
+	T& as();
 
 	template <class T>
-	constexpr typename 
-		std::enable_if<std::is_base_of<Base, T>::value, T&>::type
-		as() const;
-
-	// Friends =================================================================
-	template <class T>
-	friend void swap(poly<T>& lhs, poly<T>& rhs) noexcept;
+	const T& as() const;
 
 private:
-	void* derived_ptr; // points to derived
-	std::unique_ptr<Base> base_ptr; // points to base
+	poly_ptr<Base> data;
 
-	std::pair<void*, void*> (*copy_construct)(const void*);
+	Base* (*copy_construct)(const Base*);
 };
 
 template <class Base, class Derived, class... Args>
 poly<Base> make_poly(Args&&... args) {
-	return poly<Base>(new Derived(std::forward<Args>(args)...));
+	return poly<Base>(std::move(Derived(std::forward<Args>(args)...)));
 }
 
-template <class new_base_t, class Derived, class old_base_t>
-poly<new_base_t> transform_poly(const poly<old_base_t>& other) {
-	Derived* new_ptr = new Derived(other.as<Derived>());
-	return poly<new_base_t>(new_ptr);
+template <class NewBase, class Derived, class OldBase>
+poly<NewBase> transform_poly(const poly<OldBase>& other) {
+	return poly<NewBase>(Derived(other.as<Derived>()));
 }
 
-template <class new_base_t, class Derived, class old_base_t>
-poly<new_base_t> transform_poly(poly<old_base_t>&& other) {
-	Derived* new_ptr = other.as<Derived>();
-	other.reset();
-	return poly<new_base_t>(new_ptr);
+template <class NewBase, class Derived, class OldBase>
+poly<NewBase> transform_poly(poly<OldBase>&& other) {
+	return poly<NewBase>(Derived(std::move(other.as<Derived>())));
 }
 
 } // namespace zhukov

@@ -9,20 +9,18 @@ template <class Base, class Derived>
 typename std::enable_if<
 	std::is_base_of<Base, Derived>::value &&
 	std::is_copy_constructible<Derived>::value, 
-	std::pair<void*, void*>>::type 
+	Base*>::type 
 	clone(const void* derived_ptr) {
 	Derived* ptr = new Derived(*static_cast<const Derived*>(derived_ptr));
 
-	return std::make_pair(
-		static_cast<void*>(static_cast<Base*>(ptr)),
-		static_cast<void*>(ptr));
+	return static_cast<Base*>(ptr);
 }
 
 template <class Base, class Derived>
 typename std::enable_if<
 	std::is_base_of<Base, Derived>::value &&
 	!std::is_copy_constructible<Derived>::value, // Note the !
-	std::pair<void*, void*>>::type
+	Base*>::type
 	clone(const void* /*other (unused)*/) {
 	return throw std::runtime_error(
 		std::string("poly: poly<") +
@@ -42,153 +40,106 @@ typename std::enable_if<
 
 template<class Base>
 constexpr poly<Base>::poly() noexcept :
-	derived_ptr(nullptr),
-	base_ptr(nullptr),
+	data(nullptr),
 	copy_construct(nullptr) {
-	static_assert(std::is_polymorphic<Base>::value,
-		"poly: poly can only be used with polymorphic types");
-}
-
-template<class Base>
-constexpr poly<Base>::poly(std::nullptr_t) noexcept :
-	poly() {
 }
 
 template<class Base>
 constexpr poly<Base>::poly(const poly& other) :
-	derived_ptr(nullptr),
-	base_ptr(nullptr),
+	data(nullptr),
 	copy_construct(other.copy_construct) {
 
 	if (other) {
-		auto copy_result = copy_construct(other.derived_ptr);
-
-		base_ptr.reset(static_cast<Base*>(copy_result.first));
-		derived_ptr = copy_result.second;
+		data.reset(copy_construct(other.data.get()));
 	}
 }
 
 template<class Base>
-inline constexpr poly<Base>::poly(poly && other) noexcept :
-	poly() {
-	swap(*this, other);
-}
+inline poly<Base>& poly<Base>::operator=(const poly& other) {
+	copy_construct = other.copy_construct;
 
-template<class Base>
-inline poly<Base> & poly<Base>::operator=(poly other) {
-	swap(*this, other);
+	if (other) {
+		data.reset(copy_construct(other.data.get()));
+	}
+	
 	return *this;
 }
 
-// From a pointer ----------------------------------------------------------
+// From an object ----------------------------------------------------------
+
 template<class Base>
 template<class Derived, class>
-constexpr poly<Base>::poly(Derived* obj) :
-	derived_ptr(obj),
-	base_ptr(static_cast<Base*>(obj)),
+inline constexpr poly<Base>::poly(const Derived& obj) :
+	data(new Derived(obj)),
 	copy_construct(&detail::clone<Base, Derived>) {
-	static_assert(std::is_polymorphic<Base>::value,
-		"poly: poly can only be used with polymorphic types");
+	static_assert(std::is_base_of<Base, Derived>::value,
+		"poly: poly can only be built using types, derived from Base");
+}
+
+template<class Base>
+template<class Derived, class>
+inline constexpr poly<Base>::poly(Derived&& obj) :
+	data(new Derived(std::move(obj))),
+	copy_construct(&detail::clone<Base, Derived>) {
+	static_assert(std::is_base_of<Base, Derived>::value,
+		"poly: poly can only be built using types, derived from Base");
 }
 
 // Observers ===============================================================
 template<class Base>
 template<class T>
 constexpr bool poly<Base>::is() const noexcept {
-	return base_ptr.get() != nullptr && typeid(*base_ptr.get()) == typeid(T);
+	return data.get() != nullptr && typeid(*data.get()) == typeid(T);
 }
 
 template<class Base>
 inline poly<Base>::operator bool() const noexcept {
-	return static_cast<bool>(base_ptr);
-}
-
-// Modifiers ===============================================================
-template<class Base>
-inline Base* poly<Base>::release() noexcept {
-	Base* rslt = base_ptr.release();
-	reset();
-
-	return rslt;
-}
-
-template<class Base>
-inline void poly<Base>::reset() noexcept {
-	base_ptr.reset();
-	derived_ptr = nullptr;
-	copy_construct = nullptr;
-}
-
-template<class Base>
-template<class Derived, class>
-inline void poly<Base>::reset(Derived* obj) {
-	derived_ptr = obj;
-	base_ptr.reset(obj);
-	copy_construct = &detail::clone<Base, Derived>;
+	return static_cast<bool>(data);
 }
 
 // Member access ===========================================================
 template<class Base>
-inline Base& poly<Base>::operator*() {
-	return *base_ptr;
+inline poly<Base>::operator Base&() {
+	return *data;
 }
 
 template<class Base>
-constexpr Base& poly<Base>::operator*() const {
-	return *base_ptr;
+inline poly<Base>::operator const Base&() const {
+	return *data;
 }
 
 template<class Base>
-inline Base* poly<Base>::operator->() {
-	return base_ptr.get();
+inline Base& poly<Base>::get() {
+	return *data;
 }
 
 template<class Base>
-constexpr Base* poly<Base>::operator->() const {
-	return base_ptr.get();
-}
-
-template<class Base>
-inline Base* poly<Base>::get() {
-	return base_ptr.get();
-}
-
-template<class Base>
-constexpr Base* poly<Base>::get() const {
-	return base_ptr.get();
+inline const Base& poly<Base>::get() const {
+	return *data;
 }
 
 template<class Base>
 template<class T>
-typename std::enable_if<
-	std::is_base_of<Base, T>::value, T&>::type
-	poly<Base>::as() {
+T& poly<Base>::as() {
+	static_assert(std::is_base_of<Base, T>::value,
+		"poly: cannot interpret as class not derived from Base");
 
 	if (is<T>()) {
-		return *static_cast<T*>(derived_ptr);
+		return *data.as<T>();
 	}
 	throw std::bad_cast();
 }
 
 template<class Base>
 template<class T>
-constexpr typename std::enable_if<
-	std::is_base_of<Base, T>::value, T&>::type
-	poly<Base>::as() const {
+const T& poly<Base>::as() const {
+	static_assert(std::is_base_of<Base, T>::value,
+		"poly: cannot interpret as class not derived from Base");
 
 	if (is<T>()) {
-		return *static_cast<T*>(derived_ptr);
+		return *data.as<T>();
 	}
 	throw std::bad_cast();
-}
-
-template<class Base>
-void swap(poly<Base>& lhs, poly<Base>& rhs) noexcept {
-	using std::swap;
-
-	swap(lhs.derived_ptr, rhs.derived_ptr);
-	swap(lhs.base_ptr, rhs.base_ptr);
-	swap(lhs.copy_construct, rhs.copy_construct);
 }
 
 } // namespace zhukov

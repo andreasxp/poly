@@ -128,11 +128,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="poly.hpp" />
+    <ClInclude Include="polymorphic_traits.hpp" />
     <ClInclude Include="poly_factory.hpp" />
     <ClInclude Include="poly_ptr.hpp" />
     <ClInclude Include="tests.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="polymorphic_traits.inl" />
     <None Include="poly_ptr.inl" />
     <None Include="poly_factory.inl" />
     <None Include="poly.inl" />
