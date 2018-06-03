@@ -133,4 +133,25 @@ inline void swap(poly_ptr<Base>& lhs, poly_ptr<Base>& rhs) noexcept {
 	lhs.swap(rhs);
 }
 
+template <class Base, class Derived, class... Args>
+inline poly_ptr<Base> make_poly_ptr(Args&&... args) {
+	return poly_ptr<Base>(new Derived(std::forward<Args>(args)...));
+}
+
+template <class NewBase, class Derived, class OldBase>
+inline poly_ptr<NewBase> transform_poly_ptr(const poly_ptr<OldBase>& other) {
+	Derived* new_ptr = nullptr;
+	if (other) new_ptr = new Derived(*other.template as<Derived>());
+
+	return poly_ptr<NewBase>(new_ptr);
+}
+
+template <class NewBase, class Derived, class OldBase>
+inline poly_ptr<NewBase> transform_poly_ptr(poly_ptr<OldBase>&& other) {
+	Derived* new_ptr = other.template as<Derived>();
+	other.reset();
+	return poly_ptr<NewBase>(new_ptr);
+}
+
+
 } // namespace zhukov

@@ -67,19 +67,13 @@ private:
 };
 
 template <class Base, class Derived, class... Args>
-inline poly<Base> make_poly(Args&&... args) {
-	return poly<Base>(std::move(Derived(std::forward<Args>(args)...)));
-}
+inline poly<Base> make_poly(Args&&... args);
 
 template <class NewBase, class Derived, class OldBase>
-inline poly<NewBase> transform_poly(const poly<OldBase>& other) {
-	return poly<NewBase>(Derived(other.template as<Derived>()));
-}
+inline poly<NewBase> transform_poly(const poly<OldBase>& other);
 
 template <class NewBase, class Derived, class OldBase>
-inline poly<NewBase> transform_poly(poly<OldBase>&& other) {
-	return poly<NewBase>(Derived(std::move(other.template as<Derived>())));
-}
+inline poly<NewBase> transform_poly(poly<OldBase>&& other);
 
 } // namespace zhukov
 

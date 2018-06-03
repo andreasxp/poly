@@ -138,4 +138,19 @@ const T& poly<Base>::as() const {
 	throw std::bad_cast();
 }
 
+template <class Base, class Derived, class... Args>
+inline poly<Base> make_poly(Args&&... args) {
+	return poly<Base>(std::move(Derived(std::forward<Args>(args)...)));
+}
+
+template <class NewBase, class Derived, class OldBase>
+inline poly<NewBase> transform_poly(const poly<OldBase>& other) {
+	return poly<NewBase>(Derived(other.template as<Derived>()));
+}
+
+template <class NewBase, class Derived, class OldBase>
+inline poly<NewBase> transform_poly(poly<OldBase>&& other) {
+	return poly<NewBase>(Derived(std::move(other.template as<Derived>())));
+}
+
 } // namespace zhukov
