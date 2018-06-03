@@ -45,7 +45,7 @@ constexpr poly<Base>::poly() noexcept :
 }
 
 template<class Base>
-constexpr poly<Base>::poly(const poly& other) :
+poly<Base>::poly(const poly& other) :
 	data(nullptr),
 	copy_construct(other.copy_construct) {
 
@@ -121,7 +121,7 @@ T& poly<Base>::as() {
 		"poly: cannot interpret as class not derived from Base");
 
 	if (is<T>()) {
-		return *data.as<T>();
+		return *data.template as<T>();
 	}
 	throw std::bad_cast();
 }
@@ -133,7 +133,7 @@ const T& poly<Base>::as() const {
 		"poly: cannot interpret as class not derived from Base");
 
 	if (is<T>()) {
-		return *data.as<T>();
+		return *data.template as<T>();
 	}
 	throw std::bad_cast();
 }

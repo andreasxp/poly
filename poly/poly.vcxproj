@@ -124,9 +124,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\tests.cpp" />
     <ClCompile Include="tests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\poly.hpp" />
+    <ClInclude Include="include\polymorphic_traits.hpp" />
+    <ClInclude Include="include\poly_factory.hpp" />
+    <ClInclude Include="include\poly_ptr.hpp" />
+    <ClInclude Include="include\tests.hpp" />
     <ClInclude Include="poly.hpp" />
     <ClInclude Include="polymorphic_traits.hpp" />
     <ClInclude Include="poly_factory.hpp" />
@@ -134,6 +141,10 @@
     <ClInclude Include="tests.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="inline\poly.inl" />
+    <None Include="inline\polymorphic_traits.inl" />
+    <None Include="inline\poly_factory.inl" />
+    <None Include="inline\poly_ptr.inl" />
     <None Include="polymorphic_traits.inl" />
     <None Include="poly_ptr.inl" />
     <None Include="poly_factory.inl" />

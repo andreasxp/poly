@@ -24,7 +24,7 @@ public:
 	// Construction ============================================================
 	// Default, copy, move -----------------------------------------------------
 	constexpr poly() noexcept;
-	constexpr poly(const poly& other);
+	poly(const poly& other);
 	constexpr poly(poly&&) noexcept = default;
 	poly& operator=(const poly& other);
 	poly& operator=(poly&&) noexcept = default;
@@ -67,18 +67,18 @@ private:
 };
 
 template <class Base, class Derived, class... Args>
-poly<Base> make_poly(Args&&... args) {
+inline poly<Base> make_poly(Args&&... args) {
 	return poly<Base>(std::move(Derived(std::forward<Args>(args)...)));
 }
 
 template <class NewBase, class Derived, class OldBase>
-poly<NewBase> transform_poly(const poly<OldBase>& other) {
-	return poly<NewBase>(Derived(other.as<Derived>()));
+inline poly<NewBase> transform_poly(const poly<OldBase>& other) {
+	return poly<NewBase>(Derived(other.template as<Derived>()));
 }
 
 template <class NewBase, class Derived, class OldBase>
-poly<NewBase> transform_poly(poly<OldBase>&& other) {
-	return poly<NewBase>(Derived(std::move(other.as<Derived>())));
+inline poly<NewBase> transform_poly(poly<OldBase>&& other) {
+	return poly<NewBase>(Derived(std::move(other.template as<Derived>())));
 }
 
 } // namespace zhukov

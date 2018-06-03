@@ -21,7 +21,7 @@ constexpr poly_ptr<Base>::poly_ptr(std::nullptr_t) noexcept :
 }
 
 template<class Base>
-constexpr poly_ptr<Base>::poly_ptr(poly_ptr&& other) noexcept :
+poly_ptr<Base>::poly_ptr(poly_ptr&& other) noexcept :
 	poly_ptr() {
 	swap(other);
 }
@@ -41,7 +41,7 @@ constexpr poly_ptr<Base>& poly_ptr<Base>::operator=(std::nullptr_t) noexcept {
 // From a pointer ----------------------------------------------------------
 template<class Base>
 template<class Derived>
-constexpr poly_ptr<Base>::poly_ptr(Derived* obj) :
+poly_ptr<Base>::poly_ptr(Derived* obj) :
 	base_ptr(static_cast<Base*>(obj)) {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly_ptr: poly_ptr can only be built using types, derived from Base");

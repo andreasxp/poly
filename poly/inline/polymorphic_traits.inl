@@ -5,7 +5,7 @@ namespace zhukov {
 namespace detail {
 
 template <class Base, class Derived>
-std::atomic<std::ptrdiff_t> polymorphic_traits<Base, Derived>::offset = 0;
+std::atomic<std::ptrdiff_t> polymorphic_traits<Base, Derived>::offset;
 
 template<class Base, class Derived>
 inline Derived* polymorphic_traits<Base, Derived>::downcast(Base* ptr) {

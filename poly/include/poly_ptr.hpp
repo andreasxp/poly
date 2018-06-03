@@ -20,7 +20,7 @@ public:
 	// Default, copy, move -----------------------------------------------------
 	constexpr poly_ptr() noexcept;
 	constexpr poly_ptr(std::nullptr_t) noexcept;
-	constexpr poly_ptr(poly_ptr&& other) noexcept;
+	poly_ptr(poly_ptr&& other) noexcept;
 	constexpr poly_ptr& operator=(poly_ptr&& other) noexcept;
 	constexpr poly_ptr& operator=(std::nullptr_t) noexcept;
 
@@ -29,7 +29,7 @@ public:
 
 	// From a pointer ----------------------------------------------------------
 	template <class Derived>
-	explicit constexpr poly_ptr(Derived* obj);
+	explicit poly_ptr(Derived* obj);
 
 	// Destruction -------------------------------------------------------------
 	~poly_ptr() = default;
