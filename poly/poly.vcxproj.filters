@@ -15,12 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -29,21 +23,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="poly.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="poly_factory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tests.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="poly_ptr.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="polymorphic_traits.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\poly.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -61,18 +40,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="poly_factory.inl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="poly_ptr.inl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="poly.inl">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="polymorphic_traits.inl">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="inline\poly.inl">
       <Filter>Header Files</Filter>
     </None>

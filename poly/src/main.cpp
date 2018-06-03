@@ -7,5 +7,6 @@ int main() {
 	Tester t;
 	t.run();
 
-	system("pause");
+	std::cin.ignore();
+	std::cin.get();
 }
