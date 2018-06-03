@@ -1,22 +1,35 @@
 #pragma once
 #include "poly_factory.hpp"
+#include <algorithm>
 
 namespace zhukov {
 
 template<class Base>
 template<class Derived>
-void factory<Base>::add() {
+void factory<Base>::insert() {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly_factory: factory can only build types, derived from Base");
 	static_assert(std::is_default_constructible<Derived>::value,
 		"poly_factory: factory can only build default-constructible types");
 
-	make_funcs[POLY_TYPE_NAME(Derived)] = &make_poly<Base, Derived>;
+	auto name = POLY_TYPE_NAME(Derived);
+
+	auto it = std::lower_bound(make_funcs.cbegin(), make_funcs.cend(), name,
+		[](
+		const std::pair<std::string, poly<Base>(*)()>& lhs, 
+		const decltype(name)& rhs) {
+		return lhs.first < rhs;
+	});
+
+	if (it == make_funcs.cend() || it->first != name) {
+		make_funcs.insert(it, std::make_pair(name, &make_poly<Base, Derived>));
+	}
 }
 
 template<class Base>
 inline std::vector<std::string> factory<Base>::list() const {
 	std::vector<std::string> rslt;
+	rslt.reserve(make_funcs.size());
 
 	for (auto&& it : make_funcs) {
 		rslt.push_back(it.first);
@@ -27,7 +40,21 @@ inline std::vector<std::string> factory<Base>::list() const {
 
 template<class Base>
 inline poly<Base> factory<Base>::make(const std::string& name) const {
-	return make_funcs.at(name)();
+	auto it = std::lower_bound(make_funcs.cbegin(), make_funcs.cend(), name,
+		[](
+		const std::pair<std::string, poly<Base>(*)()>& lhs,
+		const decltype(name)& rhs) {
+		return lhs.first < rhs;
+	});
+
+	if (it != make_funcs.cend() && it->first == name) {
+		return it->second();
+	}
+
+	throw std::invalid_argument(
+		std::string("poly_factory: ") +
+		name +
+		" is not registered in this factory");
 }
 
 } // namespace zhukov

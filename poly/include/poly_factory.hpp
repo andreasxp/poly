@@ -1,10 +1,8 @@
 #pragma once
 
-#include <unordered_map> // unordered_map
 #include <vector>        // vector
 #include <string>        // string
-#include <type_traits>   // enable_if, is_base_of, is_copy_constructible,
-                         // is_default_constructible
+#include <type_traits>   // is_base_of, is_default_constructible
 #include "poly.hpp"
 
 namespace zhukov {
@@ -15,13 +13,13 @@ class factory {
 		"poly_factory: factory can only be used with polymorphic types");
 public:
 	template <class Derived>
-	void add();
+	void insert();
 	
 	std::vector<std::string> list() const;
 	poly<Base> make(const std::string& name) const;
 
 private:
-	std::unordered_map<std::string, poly<Base>(*)()> make_funcs;
+	std::vector<std::pair<std::string, poly<Base>(*)()>> make_funcs;
 };
 
 } // namespace zhukov

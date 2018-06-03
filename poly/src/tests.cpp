@@ -85,10 +85,10 @@ void Tester::run() {
 	// poly_factory ============================================================
 	{
 		factory<Base> f;
-		f.add<Der>();
-		f.add<Mid1>();
-		f.add<Mid2>();
-		f.add<Base>();
+		f.insert<Der>();
+		f.insert<Mid1>();
+		f.insert<Mid2>();
+		f.insert<Base>();
 
 		auto p1 = f.make(typeid(Der).name());
 		auto p2 = f.make(typeid(Mid1).name());
