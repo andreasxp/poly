@@ -25,18 +25,18 @@ public:
 	// Default, copy, move -----------------------------------------------------
 	constexpr poly() noexcept;
 	poly(const poly& other);
-	constexpr poly(poly&&) noexcept = default;
+	poly(poly&&) noexcept = default;
 	poly& operator=(const poly& other);
 	poly& operator=(poly&&) noexcept = default;
 
 	// From an object ----------------------------------------------------------
 	template <class Derived, class = typename std::enable_if<
 		std::is_base_of<Base, Derived>::value>::type>
-	explicit constexpr poly(const Derived& obj);
+	explicit poly(const Derived& obj);
 
 	template <class Derived, class = typename std::enable_if<
 		std::is_base_of<Base, Derived>::value>::type>
-	explicit constexpr poly(Derived&& obj);
+	explicit poly(Derived&& obj);
 
 	// Destruction -------------------------------------------------------------
 	~poly() = default;
@@ -45,7 +45,7 @@ public:
 	template <class T>
 	constexpr bool is() const noexcept;
 
-	explicit operator bool() const noexcept;
+	explicit constexpr operator bool() const noexcept;
 
 	// Member access ===========================================================
 	operator Base&();

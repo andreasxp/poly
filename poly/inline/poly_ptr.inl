@@ -21,19 +21,19 @@ constexpr poly_ptr<Base>::poly_ptr(std::nullptr_t) noexcept :
 }
 
 template<class Base>
-poly_ptr<Base>::poly_ptr(poly_ptr&& other) noexcept :
+inline poly_ptr<Base>::poly_ptr(poly_ptr&& other) noexcept :
 	poly_ptr() {
 	swap(other);
 }
 
 template<class Base>
-constexpr poly_ptr<Base>& poly_ptr<Base>::operator=(poly_ptr&& other) noexcept {
+inline poly_ptr<Base>& poly_ptr<Base>::operator=(poly_ptr&& other) noexcept {
 	swap(other);
 	return *this;
 }
 
 template<class Base>
-constexpr poly_ptr<Base>& poly_ptr<Base>::operator=(std::nullptr_t) noexcept {
+inline poly_ptr<Base>& poly_ptr<Base>::operator=(std::nullptr_t) noexcept {
 	reset();
 	return *this;
 }
@@ -41,7 +41,7 @@ constexpr poly_ptr<Base>& poly_ptr<Base>::operator=(std::nullptr_t) noexcept {
 // From a pointer ----------------------------------------------------------
 template<class Base>
 template<class Derived>
-poly_ptr<Base>::poly_ptr(Derived* obj) :
+inline poly_ptr<Base>::poly_ptr(Derived* obj) :
 	base_ptr(static_cast<Base*>(obj)) {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly_ptr: poly_ptr can only be built using types, derived from Base");
@@ -118,7 +118,7 @@ poly_ptr<Base>::get() const noexcept {
 
 template<class Base>
 template<class T>
-T* poly_ptr<Base>::as() const noexcept {
+inline T* poly_ptr<Base>::as() const noexcept {
 	static_assert(std::is_base_of<Base, T>::value,
 		"poly_ptr: cannot interpret as class not derived from Base");
 
@@ -129,7 +129,7 @@ T* poly_ptr<Base>::as() const noexcept {
 }
 
 template<class Base>
-void swap(poly_ptr<Base>& lhs, poly_ptr<Base>& rhs) noexcept {
+inline void swap(poly_ptr<Base>& lhs, poly_ptr<Base>& rhs) noexcept {
 	lhs.swap(rhs);
 }
 

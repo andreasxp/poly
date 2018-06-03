@@ -21,8 +21,8 @@ public:
 	constexpr poly_ptr() noexcept;
 	constexpr poly_ptr(std::nullptr_t) noexcept;
 	poly_ptr(poly_ptr&& other) noexcept;
-	constexpr poly_ptr& operator=(poly_ptr&& other) noexcept;
-	constexpr poly_ptr& operator=(std::nullptr_t) noexcept;
+	poly_ptr& operator=(poly_ptr&& other) noexcept;
+	poly_ptr& operator=(std::nullptr_t) noexcept;
 
 	poly_ptr(const poly_ptr&) = delete;
 	poly_ptr& operator=(const poly_ptr&) = delete;
@@ -60,6 +60,9 @@ public:
 private:
 	std::unique_ptr<Base> base_ptr;
 };
+
+template<class Base>
+inline void swap(poly_ptr<Base>& lhs, poly_ptr<Base>& rhs) noexcept;
 
 template <class Base, class Derived, class... Args>
 poly_ptr<Base> make_poly_ptr(Args&&... args) {

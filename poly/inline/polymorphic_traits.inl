@@ -20,7 +20,7 @@ inline const Derived* polymorphic_traits<Base, Derived>::downcast(const Base* pt
 }
 
 template<class Base, class Derived>
-typename std::enable_if<
+inline typename std::enable_if<
 	std::is_copy_constructible<Derived>::value, Base*>::type
 	clone(const Base* other) {
 	const Derived* temp = polymorphic_traits<Base, Derived>::downcast(other);
@@ -30,9 +30,9 @@ typename std::enable_if<
 }
 
 template<class Base, class Derived>
-typename std::enable_if<
+inline typename std::enable_if<
 	!std::is_copy_constructible<Derived>::value, Base*>::type // Note the !
-	clone(const Base* /*other (unused)*/) {
+	clone(const Base*) {
 	return throw std::runtime_error(
 		std::string("poly: poly<") +
 		POLY_TYPE_NAME(Base) +

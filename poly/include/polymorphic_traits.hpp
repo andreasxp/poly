@@ -40,6 +40,16 @@ struct polymorphic_traits {
 	static const Derived* downcast(const Base* ptr);
 };
 
+template<class Base, class Derived>
+inline typename std::enable_if<
+	std::is_copy_constructible<Derived>::value, Base*>::type
+	clone(const Base* other);
+
+template<class Base, class Derived>
+inline typename std::enable_if<
+	!std::is_copy_constructible<Derived>::value, Base*>::type // Note the !
+	clone(const Base*);
+
 } // namespace detail
 } // namespace zhukov
 

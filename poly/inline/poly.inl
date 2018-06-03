@@ -45,7 +45,7 @@ constexpr poly<Base>::poly() noexcept :
 }
 
 template<class Base>
-poly<Base>::poly(const poly& other) :
+inline poly<Base>::poly(const poly& other) :
 	data(nullptr),
 	copy_construct(other.copy_construct) {
 
@@ -69,14 +69,14 @@ inline poly<Base>& poly<Base>::operator=(const poly& other) {
 
 template<class Base>
 template<class Derived, class>
-constexpr poly<Base>::poly(const Derived& obj) :
+inline poly<Base>::poly(const Derived& obj) :
 	data(new Derived(obj)),
 	copy_construct(&detail::clone<Base, Derived>) {
 }
 
 template<class Base>
 template<class Derived, class>
-constexpr poly<Base>::poly(Derived&& obj) :
+inline poly<Base>::poly(Derived&& obj) :
 	data(new Derived(std::move(obj))),
 	copy_construct(&detail::clone<Base, Derived>) {
 }
@@ -89,7 +89,7 @@ constexpr bool poly<Base>::is() const noexcept {
 }
 
 template<class Base>
-inline poly<Base>::operator bool() const noexcept {
+constexpr poly<Base>::operator bool() const noexcept {
 	return static_cast<bool>(data);
 }
 
