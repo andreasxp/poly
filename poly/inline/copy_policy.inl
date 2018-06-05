@@ -29,12 +29,14 @@ inline typename std::enable_if<
 
 } // namespace detail
 
+template <class Base>
 template<class Derived>
-inline no_copy::no_copy(const Derived*) {
+inline no_copy<Base>::no_copy(const Derived*) {
 }
 
 template<class Base>
-inline deep_copy<Base>::deep_copy() {
+constexpr deep_copy<Base>::deep_copy() noexcept :
+	copy_construct (nullptr) {
 }
 
 template<class Base>
@@ -46,7 +48,7 @@ inline deep_copy<Base>::deep_copy(const Derived*) :
 }
 
 template<class Base>
-inline Base* deep_copy<Base>::copy(const Base* other) {
+inline Base* deep_copy<Base>::clone(const Base* other) {
 	return copy_construct(other);
 }
 

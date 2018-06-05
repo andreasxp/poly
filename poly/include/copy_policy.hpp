@@ -3,9 +3,12 @@
 
 namespace zhukov {
 
+template <class Base>
 class no_copy {
 public:
 	// Dummy constructor. No action is performed
+	constexpr no_copy() noexcept = default;
+
 	template <class Derived>
 	no_copy(const Derived*);
 };
@@ -15,12 +18,12 @@ class deep_copy {
 	static_assert(std::is_polymorphic<Base>::value,
 		"deep_copy: Base is not polymorphic");
 public:
-	deep_copy();
+	constexpr deep_copy() noexcept;
 
 	template <class Derived>
 	deep_copy(const Derived*);
 
-	Base* copy(const Base* other);
+	Base* clone(const Base* other);
 
 private:
 	Base* (*copy_construct)(const Base*);

@@ -13,13 +13,13 @@
 
 namespace zhukov {
 
-template<class Base, class CopyPolicy = no_copy>
-class poly : private CopyPolicy {
+template<class Base, template<class> class CopyPolicy = no_copy>
+class poly : private CopyPolicy<Base> {
 	static_assert(std::is_polymorphic<Base>::value,
 		"poly: poly can only be used with polymorphic types");
 public:
 	using base_type = Base;
-	using copy_policy = CopyPolicy;
+	using copy_policy = CopyPolicy<Base>;
 
 	// Construction ============================================================
 	// Default, copy, move -----------------------------------------------------
@@ -58,30 +58,31 @@ private:
 	std::unique_ptr<Base> data;
 };
 
-template <class Base, class Derived, class CopyPolicy = no_copy, class... Args>
+template <class Base, class Derived, 
+	template<class> class CopyPolicy = no_copy, class... Args>
 inline poly<Base, CopyPolicy> make_poly(Args&&... args);
 
 template <
 	class NewBase, class Derived, 
-	class OldBase, class CopyPolicy>
+	class OldBase, template<class> class CopyPolicy>
 inline poly<NewBase, CopyPolicy> 
 transform_poly(const poly<OldBase, CopyPolicy>& other);
 
 template <
-	class NewBase, class NewCopyPolicy, class Derived, 
-	class OldBase, class OldCopyPolicy>
+	class NewBase, template<class> class NewCopyPolicy, class Derived,
+	class OldBase, template<class> class OldCopyPolicy>
 inline poly<NewBase, NewCopyPolicy> 
 transform_poly(const poly<OldBase, OldCopyPolicy>& other);
 
 template <
 	class NewBase, class Derived, 
-	class OldBase, class CopyPolicy>
+	class OldBase, template<class> class CopyPolicy>
 inline poly<NewBase, CopyPolicy> 
 transform_poly(poly<OldBase, CopyPolicy>&& other);
 
 template <
-	class NewBase, class NewCopyPolicy, class Derived, 
-	class OldBase, class OldCopyPolicy>
+	class NewBase, template<class> class NewCopyPolicy, class Derived,
+	class OldBase, template<class> class OldCopyPolicy>
 inline poly<NewBase, NewCopyPolicy> 
 transform_poly(poly<OldBase, OldCopyPolicy>&& other);
 

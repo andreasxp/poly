@@ -22,32 +22,39 @@ void Tester::run() {
 		poly<Base> p1(std::move(p0));
 		auto p2 = make_poly<Base, Der>();
 		auto p3 = transform_poly<Mid1, Der>(p2);
+		auto p4 = transform_poly<Mid2, no_copy, Der>(p3);
 
 		TEST(!static_cast<bool>(p0));
 
 		TEST(p1->name() == "der");
 		TEST(p2->name() == "der");
 		TEST(p3->name() == "der");
+		TEST(p4->name() == "der");
 
 		TEST(p1.is<Der>());
 		TEST(p2.is<Der>());
 		TEST(p3.is<Der>());
+		TEST(p4.is<Der>());
 
 		TEST(!p1.is<Base>());
 		TEST(!p2.is<Base>());
 		TEST(!p3.is<Base>());
+		TEST(!p4.is<Base>());
 
 		TEST(p1.as<Der>() != nullptr);
 		TEST(p2.as<Der>() != nullptr);
 		TEST(p3.as<Der>() != nullptr);
+		TEST(p4.as<Der>() != nullptr);
 
 		TEST(p1.as<Der>()->name() == "der");
 		TEST(p2.as<Der>()->name() == "der");
 		TEST(p3.as<Der>()->name() == "der");
+		TEST(p4.as<Der>()->name() == "der");
 
 		TEST(p1.as<Base>() == nullptr);
 		TEST(p2.as<Base>() == nullptr);
 		TEST(p3.as<Mid1>() == nullptr);
+		TEST(p4.as<Mid2>() == nullptr);
 	}
 
 	// poly_factory ============================================================

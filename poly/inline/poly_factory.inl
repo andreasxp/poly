@@ -4,7 +4,7 @@
 
 namespace zhukov {
 
-template <class Base, class CopyPolicy>
+template <class Base, template<class> class CopyPolicy>
 template<class Derived>
 void factory<Base, CopyPolicy>::insert() {
 	static_assert(std::is_base_of<Base, Derived>::value,
@@ -27,7 +27,7 @@ void factory<Base, CopyPolicy>::insert() {
 	}
 }
 
-template <class Base, class CopyPolicy>
+template <class Base, template<class> class CopyPolicy>
 inline std::vector<std::string> factory<Base, CopyPolicy>::list() const {
 	std::vector<std::string> rslt;
 	rslt.reserve(make_funcs.size());
@@ -39,7 +39,7 @@ inline std::vector<std::string> factory<Base, CopyPolicy>::list() const {
 	return rslt;
 }
 
-template <class Base, class CopyPolicy>
+template <class Base, template<class> class CopyPolicy>
 inline poly<Base, CopyPolicy> 
 factory<Base, CopyPolicy>::make(const std::string& name) const {
 	auto it = std::lower_bound(make_funcs.cbegin(), make_funcs.cend(), name,
