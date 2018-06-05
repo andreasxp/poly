@@ -18,7 +18,7 @@ public:
 	deep_copy();
 
 	template <class Derived>
-	deep_copy(const Derived* ptr);
+	deep_copy(const Derived*);
 
 	Base* copy(const Base* other);
 

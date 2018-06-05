@@ -22,7 +22,8 @@ inline poly<Base, CopyPolicy>::poly(const poly& other) :
 }
 
 template<class Base, class CopyPolicy>
-inline poly<Base, CopyPolicy>& poly<Base, CopyPolicy>::operator=(const poly& other) {
+inline poly<Base, CopyPolicy>& 
+poly<Base, CopyPolicy>::operator=(const poly& other) {
 	CopyPolicy::operator=(other);
 	copy_construct = other.copy_construct;
 
@@ -34,7 +35,8 @@ inline poly<Base, CopyPolicy>& poly<Base, CopyPolicy>::operator=(const poly& oth
 }
 
 template<class Base, class CopyPolicy>
-inline poly<Base, CopyPolicy>& poly<Base, CopyPolicy>::operator=(std::nullptr_t) noexcept {
+inline poly<Base, CopyPolicy>& 
+poly<Base, CopyPolicy>::operator=(std::nullptr_t) noexcept {
 	data = nullptr;
 
 	return *this;
@@ -57,7 +59,8 @@ inline poly<Base, CopyPolicy>::poly(Derived* obj) :
 
 template<class Base, class CopyPolicy>
 template<class Derived>
-inline poly<Base, CopyPolicy>& poly<Base, CopyPolicy>::operator=(Derived* obj) {
+inline poly<Base, CopyPolicy>& 
+poly<Base, CopyPolicy>::operator=(Derived* obj) {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly: poly can only be built using types, derived from Base");
 
@@ -110,17 +113,48 @@ T* poly<Base, CopyPolicy>::as() const noexcept {
 
 template <class Base, class Derived, class CopyPolicy, class... Args>
 inline poly<Base, CopyPolicy> make_poly(Args&&... args) {
-	return poly<Base, CopyPolicy>(new Derived(std::forward<Args>(args)...));
+	return poly<Base, CopyPolicy>(
+		new Derived(std::forward<Args>(args)...));
 }
 
-template <class NewBase, class Derived, class CopyPolicy, class OldBase>
-inline poly<NewBase, CopyPolicy> transform_poly(const poly<OldBase>& other) {
-	return poly<NewBase, CopyPolicy>(new Derived(*other.template as<Derived>()));
+template <
+	class NewBase, class Derived,
+	class OldBase, class CopyPolicy>
+	inline poly<NewBase, CopyPolicy>
+	transform_poly(const poly<OldBase, CopyPolicy>& other) {
+	return poly<NewBase, CopyPolicy>(
+		new Derived(*other.template as<Derived>()));
 }
 
-template <class NewBase, class Derived, class CopyPolicy, class OldBase>
-inline poly<NewBase, CopyPolicy> transform_poly(poly<OldBase>&& other) {
-	return poly<NewBase, CopyPolicy>(new Derived(std::move(*other.template as<Derived>())));
+template <
+	class NewBase, class NewCopyPolicy, class Derived,
+	class OldBase, class OldCopyPolicy>
+	inline poly<NewBase, NewCopyPolicy>
+	transform_poly(const poly<OldBase, OldCopyPolicy>& other) {
+	return poly<NewBase, NewCopyPolicy>(
+		new Derived(*other.template as<Derived>()));
+}
+
+template <
+	class NewBase, class Derived,
+	class OldBase, class CopyPolicy>
+	inline poly<NewBase, CopyPolicy>
+	transform_poly(poly<OldBase, CopyPolicy>&& other) {
+	Derived* temp = other.template as<Derived>();
+	other = nullptr;
+	return poly<NewBase, CopyPolicy>(
+		new Derived(*temp));
+}
+
+template <
+	class NewBase, class NewCopyPolicy, class Derived,
+	class OldBase, class OldCopyPolicy>
+	inline poly<NewBase, NewCopyPolicy>
+	transform_poly(poly<OldBase, OldCopyPolicy>&& other) {
+	Derived* temp = other.template as<Derived>();
+	other = nullptr;
+	return poly<NewBase, NewCopyPolicy>(
+		new Derived(*temp));
 }
 
 } // namespace zhukov

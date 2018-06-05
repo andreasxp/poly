@@ -61,11 +61,29 @@ private:
 template <class Base, class Derived, class CopyPolicy = no_copy, class... Args>
 inline poly<Base, CopyPolicy> make_poly(Args&&... args);
 
-template <class NewBase, class Derived, class CopyPolicy = no_copy, class OldBase>
-inline poly<NewBase, CopyPolicy> transform_poly(const poly<OldBase>& other);
+template <
+	class NewBase, class Derived, 
+	class OldBase, class CopyPolicy>
+inline poly<NewBase, CopyPolicy> 
+transform_poly(const poly<OldBase, CopyPolicy>& other);
 
-template <class NewBase, class Derived, class CopyPolicy = no_copy, class OldBase>
-inline poly<NewBase, CopyPolicy> transform_poly(poly<OldBase>&& other);
+template <
+	class NewBase, class NewCopyPolicy, class Derived, 
+	class OldBase, class OldCopyPolicy>
+inline poly<NewBase, NewCopyPolicy> 
+transform_poly(const poly<OldBase, OldCopyPolicy>& other);
+
+template <
+	class NewBase, class Derived, 
+	class OldBase, class CopyPolicy>
+inline poly<NewBase, CopyPolicy> 
+transform_poly(poly<OldBase, CopyPolicy>&& other);
+
+template <
+	class NewBase, class NewCopyPolicy, class Derived, 
+	class OldBase, class OldCopyPolicy>
+inline poly<NewBase, NewCopyPolicy> 
+transform_poly(poly<OldBase, OldCopyPolicy>&& other);
 
 } // namespace zhukov
 

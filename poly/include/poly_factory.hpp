@@ -7,7 +7,7 @@
 
 namespace zhukov {
 
-template <class Base>
+template <class Base, class CopyPolicy = deep_copy<Base>>
 class factory {
 	static_assert(std::is_polymorphic<Base>::value,
 		"poly_factory: factory can only be used with polymorphic types");
@@ -16,10 +16,10 @@ public:
 	void insert();
 	
 	std::vector<std::string> list() const;
-	poly<Base> make(const std::string& name) const;
+	poly<Base, CopyPolicy> make(const std::string& name) const;
 
 private:
-	std::vector<std::pair<std::string, poly<Base>(*)()>> make_funcs;
+	std::vector<std::pair<std::string, poly<Base, CopyPolicy>(*)()>> make_funcs;
 };
 
 } // namespace zhukov

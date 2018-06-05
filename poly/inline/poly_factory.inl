@@ -4,9 +4,9 @@
 
 namespace zhukov {
 
-template<class Base>
+template <class Base, class CopyPolicy>
 template<class Derived>
-void factory<Base>::insert() {
+void factory<Base, CopyPolicy>::insert() {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly_factory: factory can only build types, derived from Base");
 	static_assert(std::is_default_constructible<Derived>::value,
@@ -16,18 +16,19 @@ void factory<Base>::insert() {
 
 	auto it = std::lower_bound(make_funcs.cbegin(), make_funcs.cend(), name,
 		[](
-		const std::pair<std::string, poly<Base>(*)()>& lhs, 
+		const std::pair<std::string, poly<Base, CopyPolicy>(*)()>& lhs,
 		const decltype(name)& rhs) {
 		return lhs.first < rhs;
 	});
 
 	if (it == make_funcs.cend() || it->first != name) {
-		make_funcs.insert(it, std::make_pair(name, &make_poly<Base, Derived>));
+		make_funcs.insert(it, 
+			std::make_pair(name, &make_poly<Base, Derived, CopyPolicy>));
 	}
 }
 
-template<class Base>
-inline std::vector<std::string> factory<Base>::list() const {
+template <class Base, class CopyPolicy>
+inline std::vector<std::string> factory<Base, CopyPolicy>::list() const {
 	std::vector<std::string> rslt;
 	rslt.reserve(make_funcs.size());
 
@@ -38,11 +39,12 @@ inline std::vector<std::string> factory<Base>::list() const {
 	return rslt;
 }
 
-template<class Base>
-inline poly<Base> factory<Base>::make(const std::string& name) const {
+template <class Base, class CopyPolicy>
+inline poly<Base, CopyPolicy> 
+factory<Base, CopyPolicy>::make(const std::string& name) const {
 	auto it = std::lower_bound(make_funcs.cbegin(), make_funcs.cend(), name,
 		[](
-		const std::pair<std::string, poly<Base>(*)()>& lhs,
+		const std::pair<std::string, poly<Base, CopyPolicy>(*)()>& lhs,
 		const decltype(name)& rhs) {
 		return lhs.first < rhs;
 	});

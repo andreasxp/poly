@@ -39,7 +39,7 @@ inline deep_copy<Base>::deep_copy() {
 
 template<class Base>
 template<class Derived>
-inline deep_copy<Base>::deep_copy(const Derived* ptr) :
+inline deep_copy<Base>::deep_copy(const Derived*) :
 	copy_construct(&detail::clone<Base, Derived>) {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"deep_copy: Base is not base of Derived");
