@@ -1,7 +1,6 @@
 #include <iostream>
 #include <iomanip>
 #include "tests.hpp"
-#include "poly_ptr.hpp"
 #include "poly.hpp"
 #include "poly_factory.hpp"
 
@@ -17,12 +16,12 @@ void Tester::print_test_result(const std::string & name, bool result) {
 }
 
 void Tester::run() {
-	// poly_ptr ================================================================
+	// poly ====================================================================
 	{
-		poly_ptr<Base> p0(new Der);
-		poly_ptr<Base> p1(std::move(p0));
-		auto p2 = make_poly_ptr<Base, Der>();
-		auto p3 = transform_poly_ptr<Mid1, Der>(p2);
+		poly<Base> p0(new Der);
+		poly<Base> p1(std::move(p0));
+		auto p2 = make_poly<Base, Der>();
+		auto p3 = transform_poly<Mid1, Der>(p2);
 
 		TEST(!static_cast<bool>(p0));
 
@@ -51,37 +50,6 @@ void Tester::run() {
 		TEST(p3.as<Mid1>() == nullptr);
 	}
 
-	// poly ====================================================================
-	{
-		poly<Base> p0 {Der()};
-		poly<Base> p1(p0);
-		poly<Base> p2(std::move(p0));
-		auto p3 = make_poly<Base, Der>();
-		auto p4 = transform_poly<Mid1, Der>(p2);
-
-		TEST(!static_cast<bool>(p0));
-
-		TEST(static_cast<Base&>(p1).name() == "der");
-		TEST(static_cast<Base&>(p2).name() == "der");
-		TEST(static_cast<Base&>(p3).name() == "der");
-		TEST(static_cast<Mid1&>(p4).name() == "der");
-
-		TEST(p1.get().name() == "der");
-		TEST(p2.get().name() == "der");
-		TEST(p3.get().name() == "der");
-		TEST(p4.get().name() == "der");
-
-		TEST(p1.is<Der>());
-		TEST(p2.is<Der>());
-		TEST(p3.is<Der>());
-		TEST(p4.is<Der>());
-
-		TEST(!p1.is<Base>());
-		TEST(!p2.is<Base>());
-		TEST(!p3.is<Base>());
-		TEST(!p4.is<Mid1>());
-	}
-
 	// poly_factory ============================================================
 	{
 		factory<Base> f;
@@ -95,15 +63,10 @@ void Tester::run() {
 		auto p3 = f.make(typeid(Mid2).name());
 		auto p4 = f.make(typeid(Base).name());
 
-		TEST(static_cast<Base&>(p1).name() == "der");
-		TEST(static_cast<Base&>(p2).name() == "mid1");
-		TEST(static_cast<Base&>(p3).name() == "mid2");
-		TEST(static_cast<Base&>(p4).name() == "base");
-
-		TEST(p1.get().name() == "der");
-		TEST(p2.get().name() == "mid1");
-		TEST(p3.get().name() == "mid2");
-		TEST(p4.get().name() == "base");
+		TEST(p1.get()->name() == "der");
+		TEST(p2.get()->name() == "mid1");
+		TEST(p3.get()->name() == "mid2");
+		TEST(p4.get()->name() == "base");
 
 		TEST(p1.is<Der>());
 		TEST(p2.is<Mid1>());

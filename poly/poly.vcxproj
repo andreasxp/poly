@@ -131,17 +131,17 @@
     <ClCompile Include="src\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\copy_policy.hpp" />
     <ClInclude Include="include\poly.hpp" />
     <ClInclude Include="include\polymorphic_traits.hpp" />
     <ClInclude Include="include\poly_factory.hpp" />
-    <ClInclude Include="include\poly_ptr.hpp" />
     <ClInclude Include="include\tests.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="inline\copy_policy.inl" />
     <None Include="inline\poly.inl" />
     <None Include="inline\polymorphic_traits.inl" />
     <None Include="inline\poly_factory.inl" />
-    <None Include="inline\poly_ptr.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
