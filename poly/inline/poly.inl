@@ -185,4 +185,144 @@ template <
 	other.release();
 }
 
+// Comparison operators ========================================================
+
+//template<class T1, class D1, class T2, class D2>
+//bool operator!=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);
+
+namespace detail {
+
+template<class T, class R = void>
+struct enable_if_defined {
+	using type = R;
+};
+
+template<class T, class Enable = void>
+struct defines_type : std::false_type {
+};
+
+template<class T>
+struct defines_type<
+	T, typename enable_if_defined<typename T::type>::type> : std::true_type {
+};
+
+} // namespace detail
+
+template<
+	class B1, template <class> class C1,
+	class B2, template <class> class C2>
+	bool operator==(const poly<B1, C1>& x, const poly<B2, C2>& y) {
+	return x.get() == y.get();
+}
+
+template<
+	class B1, template <class> class C1,
+	class B2, template <class> class C2>
+	bool operator!=(const poly<B1, C1>& x, const poly<B2, C2>& y) {
+	return !(x == y);
+}
+
+template<
+	class B1, template <class> class C1,
+	class B2, template <class> class C2>
+	bool operator<(const poly<B1, C1>& x, const poly<B2, C2>& y) {
+	using common = std::common_type<poly<B1, C1>::base_type*, poly<B2, C2>::base_type*>;
+	static_assert(detail::defines_type<common>::value, 
+		"comparison: these poly types cannot be compared: internal objects must have the same class, or be convertible to one base class");
+
+	return std::less<common::type>()(x.get(), y.get());
+}
+
+template<
+	class B1, template <class> class C1,
+	class B2, template <class> class C2>
+	bool operator<=(const poly<B1, C1>& x, const poly<B2, C2>& y) {
+	return !(y < x);
+}
+
+template<
+	class B1, template <class> class C1,
+	class B2, template <class> class C2>
+	bool operator>(const poly<B1, C1>& x, const poly<B2, C2>& y) {
+	return y < x;
+}
+
+template<
+	class B1, template <class> class C1,
+	class B2, template <class> class C2>
+	bool operator>=(const poly<B1, C1>& x, const poly<B2, C2>& y) {
+	return !(x < y);
+}
+
+template <class B, template <class> class C>
+bool operator==(const poly<B, C>& x, nullptr_t) noexcept {
+	return !(x != nullptr);
+}
+
+template <class B, template <class> class C>
+bool operator==(nullptr_t, const poly<B, C>& x) noexcept {
+	return !(nullptr != x);
+}
+
+template <class B, template <class> class C>
+bool operator!=(const poly<B, C>& x, nullptr_t) noexcept {
+	return static_cast<bool>(x);
+}
+
+template <class B, template <class> class C>
+bool operator!=(nullptr_t, const poly<B, C>& x) noexcept {
+	return static_cast<bool>(x);
+}
+
+template <class B, template <class> class C>
+bool operator<(const poly<B, C>& x, nullptr_t) {
+	return std::less<poly<B, C>::base_type*>()(x.get(), nullptr);
+}
+
+template <class B, template <class> class C>
+bool operator<(nullptr_t, const poly<B, C>& y) {
+	return std::less<poly<B, C>::base_type*>()(nullptr, y.get());
+}
+
+template <class B, template <class> class C>
+bool operator<=(const poly<B, C>& x, nullptr_t) {
+	return !(nullptr < x);
+}
+
+template <class B, template <class> class C>
+bool operator<=(nullptr_t, const poly<B, C>& y) {
+	return !(y < nullptr);
+}
+
+template <class B, template <class> class C>
+bool operator>(const poly<B, C>& x, nullptr_t) {
+	return nullptr < x;
+}
+
+template <class B, template <class> class C>
+bool operator>(nullptr_t, const poly<B, C>& y) {
+	return y < nullptr;
+}
+
+template <class B, template <class> class C>
+bool operator>=(const poly<B, C>& x, nullptr_t) {
+	return !(x < nullptr);
+}
+
+template <class B, template <class> class C>
+bool operator>=(nullptr_t, const poly<B, C>& y) {
+	return !(nullptr < y);
+}
+
 } // namespace zhukov
+
+namespace std {
+
+template<class Base, template<class> class CopyPolicy>
+struct hash<zhukov::poly<Base, CopyPolicy>> {
+	size_t operator()(const zhukov::poly<Base, CopyPolicy>& x) const {
+		return hash<zhukov::poly<Base, CopyPolicy>::base_type*>()(x.get());
+	}
+};
+
+} // namespace std

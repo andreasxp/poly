@@ -10,9 +10,9 @@ using namespace std;
 #define TEST(...) print_test_result(#__VA_ARGS__, __VA_ARGS__)
 
 void Tester::print_test_result(const std::string& name, bool result) {
-	string spacer(80 - 13 - name.size(), ' ');
+	string spacer(80 - 5 - name.size(), ' ');
 	cerr << std::boolalpha <<
-		"Testing " << name << spacer << result << endl;
+		name << spacer << result << endl;
 }
 
 void Tester::run() {
@@ -23,6 +23,7 @@ void Tester::run() {
 		auto p2 = make_poly<Base, Der>();
 		auto p3 = transform_poly<Mid1, Der>(p2);
 		auto p4 = transform_poly<Mid2, deep_copy, Der>(p3);
+		auto p5 = p4;
 		
 		TEST(!static_cast<bool>(p0));
 
@@ -55,6 +56,28 @@ void Tester::run() {
 		TEST(p2.as<Base>() == nullptr);
 		TEST(p3.as<Mid1>() == nullptr);
 		TEST(p4.as<Mid2>() == nullptr);
+
+		TEST(p1 == p1);
+		TEST(p1 != p2);
+		TEST((p1 < p2) ^ (p1 > p2));
+		TEST((p1 <= p2) ^ (p1 >= p2));
+
+		TEST(p0 == nullptr);
+		TEST(nullptr == p0);
+		TEST(nullptr != p1);
+		TEST(p1 != nullptr);
+
+		TEST(!(p0 < nullptr));
+		TEST(!(nullptr < p0));
+		TEST(!(nullptr > p0));
+		TEST(!(p0 > nullptr));
+
+		TEST(p0 <= nullptr);
+		TEST(nullptr <= p0);
+		TEST(nullptr >= p0);
+		TEST(p0 >= nullptr);
+
+		TEST(std::hash<poly<Base>>()(p1) == std::hash<Base*>()(p1.get()));
 	}
 
 	// poly_factory ============================================================

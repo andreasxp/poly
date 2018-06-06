@@ -64,6 +64,8 @@ private:
 	std::unique_ptr<Base> data;
 };
 
+// Make ========================================================================
+
 template <class Base, class Derived, 
 	class... Args>
 inline poly<Base> make_poly(Args&&... args);
@@ -71,6 +73,8 @@ inline poly<Base> make_poly(Args&&... args);
 template <class Base, template<class> class CopyPolicy, class Derived,
 	class... Args>
 inline poly<Base, CopyPolicy> make_poly(Args&&... args);
+
+// Transform ===================================================================
 
 template <
 	class NewBase, class Derived, 
@@ -96,6 +100,79 @@ template <
 inline poly<NewBase, NewCopyPolicy> 
 transform_poly(poly<OldBase, OldCopyPolicy>&& other);
 
+// Comparison operators ========================================================
+
+template<
+	class B1, template <class> class C1, 
+	class B2, template <class> class C2>
+bool operator==(const poly<B1, C1>& x, const poly<B2, C2>& y);
+
+template<
+	class B1, template <class> class C1, 
+	class B2, template <class> class C2>
+bool operator!=(const poly<B1, C1>& x, const poly<B2, C2>& y);
+
+template<
+	class B1, template <class> class C1,
+	class B2, template <class> class C2>
+bool operator<(const poly<B1, C1>& x, const poly<B2, C2>& y);
+
+template<
+	class B1, template <class> class C1, 
+	class B2, template <class> class C2>
+bool operator<=(const poly<B1, C1>& x, const poly<B2, C2>& y);
+
+template<
+	class B1, template <class> class C1, 
+	class B2, template <class> class C2>
+bool operator>(const poly<B1, C1>& x, const poly<B2, C2>& y);
+
+template<
+	class B1, template <class> class C1, 
+	class B2, template <class> class C2>
+bool operator>=(const poly<B1, C1>& x, const poly<B2, C2>& y);
+
+template <class B, template <class> class C>
+bool operator==(const poly<B, C>& x, nullptr_t) noexcept;
+
+template <class B, template <class> class C>
+bool operator==(nullptr_t, const poly<B, C>& x) noexcept;
+
+template <class B, template <class> class C>
+bool operator!=(const poly<B, C>& x, nullptr_t) noexcept;
+
+template <class B, template <class> class C>
+bool operator!=(nullptr_t, const poly<B, C>& x) noexcept;
+
+template <class B, template <class> class C>
+bool operator<(const poly<B, C>& x, nullptr_t);
+
+template <class B, template <class> class C>
+bool operator<(nullptr_t, const poly<B, C>& y);
+
+template <class B, template <class> class C>
+bool operator<=(const poly<B, C>& x, nullptr_t);
+
+template <class B, template <class> class C>
+bool operator<=(nullptr_t, const poly<B, C>& y);
+
+template <class B, template <class> class C>
+bool operator>(const poly<B, C>& x, nullptr_t);
+
+template <class B, template <class> class C>
+bool operator>(nullptr_t, const poly<B, C>& y);
+
+template <class B, template <class> class C>
+bool operator>=(const poly<B, C>& x, nullptr_t);
+
+template <class B, template <class> class C>
+bool operator>=(nullptr_t, const poly<B, C>& y);
+
 } // namespace zhukov
+
+namespace std {
+template<class Base, template<class> class CopyPolicy>
+struct hash<zhukov::poly<Base, CopyPolicy>>;
+} // namespace std
 
 #include "poly.inl"
