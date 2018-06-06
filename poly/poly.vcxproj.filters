@@ -29,13 +29,13 @@
     <ClInclude Include="include\poly_factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\polymorphic_traits.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\tests.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\copy_policy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\inheritance_traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -46,10 +46,10 @@
     <None Include="inline\poly_factory.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="inline\polymorphic_traits.inl">
+    <None Include="inline\copy_policy.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="inline\copy_policy.inl">
+    <None Include="inline\inheritance_traits.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

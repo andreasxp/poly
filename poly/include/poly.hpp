@@ -5,8 +5,7 @@
 #include <stdexcept>   // runtime_error
 #include <string>      // string
 #include <typeinfo>    // typeid, bad_cast
-#include <type_traits> // is_polymorphic, enable_if, is_base_of, 
-                       // is_copy_constructible
+#include <type_traits> // has_virtual_destructor, enable_if, is_base_of
 #include <utility>     // forward
 
 #include "copy_policy.hpp"
@@ -15,8 +14,8 @@ namespace zhukov {
 
 template<class Base, template<class> class CopyPolicy = no_copy>
 class poly : private CopyPolicy<Base> {
-	static_assert(std::is_polymorphic<Base>::value,
-		"poly: poly can only be used with polymorphic types");
+	static_assert(std::has_virtual_destructor<Base>::value,
+		"poly: Base must have a virtual destructor");
 public:
 	using base_type = Base;
 	using copy_policy = CopyPolicy<Base>;

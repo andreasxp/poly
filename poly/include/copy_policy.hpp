@@ -15,8 +15,6 @@ public:
 
 template <class Base>
 class deep_copy {
-	static_assert(std::is_polymorphic<Base>::value,
-		"deep_copy: Base is not polymorphic");
 public:
 	constexpr deep_copy() noexcept;
 

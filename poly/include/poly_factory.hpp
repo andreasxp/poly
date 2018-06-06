@@ -9,8 +9,6 @@ namespace zhukov {
 
 template <class Base, template<class> class CopyPolicy = deep_copy>
 class factory {
-	static_assert(std::is_polymorphic<Base>::value,
-		"poly_factory: factory can only be used with polymorphic types");
 public:
 	template <class Derived>
 	void insert();

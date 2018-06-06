@@ -4,9 +4,10 @@
 #include <typeinfo>    // typeid
 #include <string>      // string
 #include <stdexcept>   // runtime_error
+#include <type_traits> // is_base_of
 
 /*!
-\brief   Macro to override typeid for rtti in polymorphic_traits
+\brief   Macro to override typeid for rtti in poly
 \details Define POLY_CUSTOM_RTTI(type) as a function that returns
 your type's name. Do this **before** including poly.hpp
 or poly_factory.hpp.
@@ -25,13 +26,9 @@ namespace zhukov {
 namespace detail {
 
 template <class Base, class Derived>
-struct polymorphic_traits {
-	// Checks ==================================================================
-	static_assert(std::is_polymorphic<Base>::value,
-		"polymorphic_traits: Base is not polymorphic");
-
+struct inheritance_traits {
 	static_assert(std::is_base_of<Base, Derived>::value,
-		"polymorphic_traits: Base is not base of Derived");
+		"inheritance_traits: Base is not base of Derived");
 
 	// Static members ==========================================================
 	static std::atomic<std::ptrdiff_t> offset;
@@ -43,4 +40,4 @@ struct polymorphic_traits {
 } // namespace detail
 } // namespace zhukov
 
-#include "polymorphic_traits.inl"
+#include "inheritance_traits.inl"

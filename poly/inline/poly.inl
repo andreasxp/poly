@@ -51,7 +51,7 @@ inline poly<Base, CopyPolicy>::poly(Derived* obj) :
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly: poly can only be built using types, derived from Base");
 
-	detail::polymorphic_traits<Base, Derived>::offset =
+	detail::inheritance_traits<Base, Derived>::offset =
 		reinterpret_cast<unsigned char*>(obj) -
 		reinterpret_cast<unsigned char*>(data.get());
 }
@@ -65,7 +65,7 @@ poly<Base, CopyPolicy>::operator=(Derived* obj) {
 
 	data.reset(obj);
 
-	detail::polymorphic_traits<Base, Derived>::offset =
+	detail::inheritance_traits<Base, Derived>::offset =
 		reinterpret_cast<unsigned char*>(obj) -
 		reinterpret_cast<unsigned char*>(data.get());
 }
@@ -100,7 +100,7 @@ inline void poly<Base, CopyPolicy>::reset(Derived* obj) noexcept {
 
 	data.reset(obj);
 
-	detail::polymorphic_traits<Base, Derived>::offset =
+	detail::inheritance_traits<Base, Derived>::offset =
 		reinterpret_cast<unsigned char*>(obj) -
 		reinterpret_cast<unsigned char*>(data.get());
 }
@@ -128,7 +128,7 @@ T* poly<Base, CopyPolicy>::as() const noexcept {
 		"poly: cannot interpret as class not derived from Base");
 
 	if (is<T>()) {
-		return detail::polymorphic_traits<Base, T>::downcast(data.get());
+		return detail::inheritance_traits<Base, T>::downcast(data.get());
 	}
 	return nullptr;
 }
