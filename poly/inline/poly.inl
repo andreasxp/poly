@@ -7,17 +7,12 @@ namespace zhukov {
 // Default, copy, move -----------------------------------------------------
 
 template<class Base, template<class> class CopyPolicy>
-inline constexpr poly<Base, CopyPolicy>::poly(std::nullptr_t) noexcept :
-	data(nullptr) {
-}
-
-template<class Base, template<class> class CopyPolicy>
 inline poly<Base, CopyPolicy>::poly(const poly& other) :
 	copy_policy(other),
 	data(nullptr) {
 
 	if (other) {
-		data.reset(clone(other.data.get()));
+		reset(clone(other.get()));
 	}
 }
 
@@ -27,10 +22,16 @@ poly<Base, CopyPolicy>::operator=(const poly& other) {
 	copy_policy::operator=(other);
 
 	if (other) {
-		data.reset(clone(other.data.get()));
+		reset(clone(other.get()));
 	}
+	else reset();
 	
 	return *this;
+}
+
+template<class Base, template<class> class CopyPolicy>
+inline constexpr poly<Base, CopyPolicy>::poly(std::nullptr_t) noexcept :
+	data(nullptr) {
 }
 
 template<class Base, template<class> class CopyPolicy>
@@ -41,7 +42,54 @@ poly<Base, CopyPolicy>::operator=(std::nullptr_t) noexcept {
 	return *this;
 }
 
-// From an object ----------------------------------------------------------
+// Converting to const -----------------------------------------------------
+
+template<class Base, template<class> class CopyPolicy>
+template <class>
+poly<Base, CopyPolicy>::poly(const poly<typename
+	std::remove_const<Base>::type, CopyPolicy>& other) :
+	copy_policy(other.get_policy()),
+	data(nullptr) {
+
+	if (other) {
+		reset(clone(other.get()));
+	}
+}
+
+template<class Base, template<class> class CopyPolicy>
+template <class>
+poly<Base, CopyPolicy>::poly(poly<typename
+	std::remove_const<Base>::type, CopyPolicy>&& other) noexcept :
+	copy_policy(std::move(other.get_policy())),
+	data(other.release()) {
+}
+
+template<class Base, template<class> class CopyPolicy>
+template <class>
+poly<Base, CopyPolicy>& poly<Base, CopyPolicy>::operator=(const poly<typename
+	std::remove_const<Base>::type, CopyPolicy>& other) {
+	copy_policy::operator=(other.get_policy());
+
+	if (other) {
+		reset(clone(other.get()));
+	}
+	else reset();
+
+	return *this;
+}
+
+template<class Base, template<class> class CopyPolicy>
+template <class>
+poly<Base, CopyPolicy>& poly<Base, CopyPolicy>::operator=(poly<typename
+	std::remove_const<Base>::type, CopyPolicy>&& other) noexcept {
+	copy_policy::operator=(other);
+
+	reset(other.release());
+
+	return *this;
+}
+
+// From a pointer ----------------------------------------------------------
 
 template<class Base, template<class> class CopyPolicy>
 template<class Derived>
@@ -51,9 +99,7 @@ inline poly<Base, CopyPolicy>::poly(Derived* obj) :
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly: poly can only be built using types, derived from Base");
 
-	detail::inheritance_traits<Base, Derived>::offset =
-		reinterpret_cast<unsigned char*>(obj) -
-		reinterpret_cast<unsigned char*>(data.get());
+	detail::inheritance_traits<Base, Derived>::set_offset(get(), obj);
 }
 
 template<class Base, template<class> class CopyPolicy>
@@ -63,18 +109,15 @@ poly<Base, CopyPolicy>::operator=(Derived* obj) {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly: poly can only be built using types, derived from Base");
 
-	data.reset(obj);
-
-	detail::inheritance_traits<Base, Derived>::offset =
-		reinterpret_cast<unsigned char*>(obj) -
-		reinterpret_cast<unsigned char*>(data.get());
+	reset(obj);
+	detail::inheritance_traits<Base, Derived>::set_offset(get(), obj);
 }
 
 // Observers ===============================================================
 template<class Base, template<class> class CopyPolicy>
 template<class T>
 constexpr bool poly<Base, CopyPolicy>::is() const noexcept {
-	return data.get() != nullptr && typeid(*data.get()) == typeid(T);
+	return get() != nullptr && typeid(*get()) == typeid(T);
 }
 
 template<class Base, template<class> class CopyPolicy>
@@ -100,9 +143,7 @@ inline void poly<Base, CopyPolicy>::reset(Derived* obj) noexcept {
 
 	data.reset(obj);
 
-	detail::inheritance_traits<Base, Derived>::offset =
-		reinterpret_cast<unsigned char*>(obj) -
-		reinterpret_cast<unsigned char*>(data.get());
+	detail::inheritance_traits<Base, Derived>::set_offset(get(), obj);
 }
 
 template<class Base, template<class> class CopyPolicy>
@@ -119,6 +160,12 @@ inline Base* poly<Base, CopyPolicy>::operator->() const noexcept {
 template<class Base, template<class> class CopyPolicy>
 inline Base* poly<Base, CopyPolicy>::get() const noexcept {
 	return data.get();
+}
+
+template<class Base, template <class> class CopyPolicy>
+inline typename poly<Base, CopyPolicy>::copy_policy 
+poly<Base, CopyPolicy>::get_policy() const noexcept {
+	return static_cast<copy_policy>(*this);
 }
 
 template<class Base, template<class> class CopyPolicy>

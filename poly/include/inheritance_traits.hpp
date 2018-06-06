@@ -26,15 +26,25 @@ namespace zhukov {
 namespace detail {
 
 template <class Base, class Derived>
-struct inheritance_traits {
-	static_assert(std::is_base_of<Base, Derived>::value,
-		"inheritance_traits: Base is not base of Derived");
-
-	// Static members ==========================================================
-	static std::atomic<std::ptrdiff_t> offset;
+class inheritance_traits_impl {
+public:
+	static void set_offset(const Base* base_ptr, const Derived* derived_ptr);
 
 	static Derived* downcast(Base* ptr);
 	static const Derived* downcast(const Base* ptr);
+
+private:
+	static std::atomic<std::ptrdiff_t> offset;
+};
+
+// Inherits inheritance_traits_impl, so every base-derived
+// pair has the same offset and members no matter how const
+template <class Base, class Derived>
+class inheritance_traits : public inheritance_traits_impl<
+	typename std::decay<Base>::type,
+	typename std::decay<Derived>::type> {
+	static_assert(std::is_base_of<Base, Derived>::value,
+		"inheritance_traits: Base is not base of Derived");
 };
 
 } // namespace detail

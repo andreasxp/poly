@@ -20,11 +20,21 @@ void Tester::run() {
 	{
 		poly<Base> p0(new Der);
 		poly<Base> p1(std::move(p0));
-		auto p2 = make_poly<Base, Der>();
+		auto p2 = make_poly<Base, deep_copy, Der>();
 		auto p3 = transform_poly<Mid1, Der>(p2);
 		auto p4 = transform_poly<Mid2, deep_copy, Der>(p3);
-		auto p5 = p4;
 		
+		auto p5 = make_poly<Base, deep_copy, Der>();
+		poly<const Base, deep_copy> p6(p5);
+		poly<const Base, deep_copy> p7;
+		p7 = p5;
+		poly<const Base, deep_copy> p8(std::move(p5));
+		poly<const Base, deep_copy> p9;
+		p9 = std::move(p7);
+
+		static_assert(sizeof(poly<Base>) == sizeof(Base*), "");
+		static_assert(sizeof(poly<Base, deep_copy>) > sizeof(Base*), "");
+
 		TEST(!static_cast<bool>(p0));
 
 		TEST(p1->name() == "der");

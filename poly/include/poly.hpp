@@ -13,22 +13,37 @@
 namespace zhukov {
 
 template<class Base, template<class> class CopyPolicy = no_copy>
-class poly : private CopyPolicy<Base> {
+class poly : private CopyPolicy<typename std::decay<Base>::type> {
 	static_assert(std::has_virtual_destructor<Base>::value,
 		"poly: Base must have a virtual destructor");
 public:
 	using base_type = Base;
-	using copy_policy = CopyPolicy<Base>;
+	using copy_policy = CopyPolicy<typename std::decay<Base>::type>;
 
 	// Construction ============================================================
 	// Default, copy, move -----------------------------------------------------
 	constexpr poly() noexcept = default;
-	constexpr poly(std::nullptr_t) noexcept;
 	poly(const poly& other);
 	poly(poly&&) noexcept = default;
 	poly& operator=(const poly& other);
 	poly& operator=(poly&&) noexcept = default;
+	
+	constexpr poly(std::nullptr_t) noexcept;
 	poly& operator=(std::nullptr_t) noexcept;
+
+	// Converting to const -----------------------------------------------------
+	template <class = typename std::enable_if<std::is_const<Base>::value>::type>
+	poly(const poly<typename
+		std::remove_const<Base>::type, CopyPolicy>& other);
+	template <class = typename std::enable_if<std::is_const<Base>::value>::type>
+	poly(poly<typename
+		std::remove_const<Base>::type, CopyPolicy>&& other) noexcept;
+	template <class = typename std::enable_if<std::is_const<Base>::value>::type>
+	poly& operator=(const poly<typename
+		std::remove_const<Base>::type, CopyPolicy>& other);
+	template <class = typename std::enable_if<std::is_const<Base>::value>::type>
+	poly& operator=(poly<typename
+		std::remove_const<Base>::type, CopyPolicy>&& other) noexcept;
 
 	// From a pointer ----------------------------------------------------------
 	template <class Derived>
@@ -59,6 +74,8 @@ public:
 
 	template <class T>
 	T* as() const noexcept;
+
+	copy_policy get_policy() const noexcept;
 
 private:
 	std::unique_ptr<Base> data;
