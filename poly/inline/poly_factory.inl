@@ -23,7 +23,7 @@ void factory<Base, CopyPolicy>::insert() {
 
 	if (it == make_funcs.cend() || it->first != name) {
 		make_funcs.insert(it, 
-			std::make_pair(name, &make_poly<Base, Derived, CopyPolicy>));
+			std::make_pair(name, &make_poly<Base, CopyPolicy, Derived>));
 	}
 }
 

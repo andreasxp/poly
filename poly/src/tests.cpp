@@ -9,7 +9,7 @@ using namespace std;
 
 #define TEST(...) print_test_result(#__VA_ARGS__, __VA_ARGS__)
 
-void Tester::print_test_result(const std::string & name, bool result) {
+void Tester::print_test_result(const std::string& name, bool result) {
 	string spacer(80 - 13 - name.size(), ' ');
 	cerr << std::boolalpha <<
 		"Testing " << name << spacer << result << endl;
@@ -22,8 +22,8 @@ void Tester::run() {
 		poly<Base> p1(std::move(p0));
 		auto p2 = make_poly<Base, Der>();
 		auto p3 = transform_poly<Mid1, Der>(p2);
-		auto p4 = transform_poly<Mid2, no_copy, Der>(p3);
-
+		auto p4 = transform_poly<Mid2, deep_copy, Der>(p3);
+		
 		TEST(!static_cast<bool>(p0));
 
 		TEST(p1->name() == "der");

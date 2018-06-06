@@ -31,7 +31,7 @@ public:
 	poly& operator=(poly&&) noexcept = default;
 	poly& operator=(std::nullptr_t) noexcept;
 
-	// From an object ----------------------------------------------------------
+	// From a pointer ----------------------------------------------------------
 	template <class Derived>
 	explicit poly(Derived* obj);
 	template <class Derived>
@@ -46,6 +46,13 @@ public:
 
 	explicit constexpr operator bool() const noexcept;
 
+	// Modifiers ===============================================================
+	Base* release() noexcept;
+	void reset(std::nullptr_t = nullptr) noexcept;
+
+	template <class Derived>
+	void reset(Derived* obj) noexcept;
+
 	// Member access ===========================================================
 	Base& operator*() const;
 	Base* operator->() const noexcept;
@@ -59,7 +66,11 @@ private:
 };
 
 template <class Base, class Derived, 
-	template<class> class CopyPolicy = no_copy, class... Args>
+	class... Args>
+inline poly<Base> make_poly(Args&&... args);
+
+template <class Base, template<class> class CopyPolicy, class Derived,
+	class... Args>
 inline poly<Base, CopyPolicy> make_poly(Args&&... args);
 
 template <
