@@ -5,7 +5,7 @@ Avoid memory leaks, enforce correct polymorphic behavior, clone without CRTP, an
 Poly is a single-header library. You can download the latest release [here](https://github.com/andreasxp/poly/releases).
 To use `poly`, your compiler must be up to ISO C++11 standard.
 ## Usage
-This section contains only a basic explanation. For a more complete documentation, refer [here](#documentation)
+This section contains only a basic explanation. For a more complete documentation, refer [here](#documentation).
 #### Include header:
 ```c++
 #include "poly.hpp"
