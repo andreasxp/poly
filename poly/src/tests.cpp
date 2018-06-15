@@ -4,7 +4,7 @@
 #include "poly.hpp"
 #include "poly_factory.hpp"
 
-using namespace zhukov;
+using pl::poly;
 using namespace std;
 
 #define TEST(...) print_test_result(#__VA_ARGS__, __VA_ARGS__)
@@ -20,20 +20,22 @@ void Tester::run() {
 	{
 		poly<Base> p0(new Der);
 		poly<Base> p1(std::move(p0));
-		auto p2 = make_poly<Base, deep_copy, Der>();
-		auto p3 = transform_poly<Mid1, Der>(p2);
-		auto p4 = transform_poly<Mid2, deep_copy, Der>(p3);
+		auto p2 = pl::make<poly<Base, pl::deep<Base>>, Der>();
+		auto p3 = pl::transform<poly<Mid1>, Der>(p2);
+		auto p4 = pl::transform<poly<Mid2, pl::deep<Base>>, Der>(p3);
 		
-		auto p5 = make_poly<Base, deep_copy, Der>();
-		poly<const Base, deep_copy> p6(p5);
-		poly<const Base, deep_copy> p7;
+		auto p5 = pl::make<poly<Base, pl::deep<Base>>, Der>();
+		poly<const Base, pl::deep<const Base>> p6(p5);
+		poly<const Base, pl::deep<const Base>> p7;
 		p7 = p5;
-		poly<const Base, deep_copy> p8(std::move(p5));
-		poly<const Base, deep_copy> p9;
+		poly<const Base, pl::deep<const Base>> p8(std::move(p5));
+		poly<const Base, pl::deep<const Base>> p9;
 		p9 = std::move(p7);
 
-		static_assert(sizeof(poly<Base>) == sizeof(Base*), "");
-		static_assert(sizeof(poly<Base, deep_copy>) > sizeof(Base*), "");
+		static_assert(sizeof(poly<Base, pl::unique<Base>>) == sizeof(Base*), "EBO failed");
+		static_assert(sizeof(pl::deep<Base>) == sizeof(Base* (*)(const Base*)), "EBO failed");
+		static_assert(sizeof(std::unique_ptr<Base>) == sizeof(Base*), "EBO failed");
+		static_assert(sizeof(poly<Base, pl::deep<Base>>) > sizeof(Base*), "EBO exists where should not");
 
 		TEST(!static_cast<bool>(p0));
 
@@ -92,7 +94,7 @@ void Tester::run() {
 
 	// poly_factory ============================================================
 	{
-		factory<Base> f;
+		pl::factory<Base> f;
 		f.insert<Der>();
 		f.insert<Mid1>();
 		f.insert<Mid2>();

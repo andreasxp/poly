@@ -1,241 +1,231 @@
 #pragma once
 #include "poly.hpp"
 
-namespace zhukov {
+namespace pl {
 
 // Construction ============================================================
 // Default, copy, move -----------------------------------------------------
 
-template<class Base, template<class> class CopyPolicy>
-inline poly<Base, CopyPolicy>::poly(const poly& other) :
-	copy_policy(other),
-	data(nullptr) {
-
-	if (other) {
-		reset(clone(other.get()));
-	}
+template<class Base, class CopyDeletePolicy>
+inline constexpr poly<Base, CopyDeletePolicy>::poly() noexcept :
+	data (nullptr) {
 }
 
-template<class Base, template<class> class CopyPolicy>
-inline poly<Base, CopyPolicy>& 
-poly<Base, CopyPolicy>::operator=(const poly& other) {
-	copy_policy::operator=(other);
+template<class Base, class CopyDeletePolicy>
+inline poly<Base, CopyDeletePolicy>::poly(const poly& other) :
+	policy(other),
+	data(nullptr) {
+	if (other) data = clone(other.get());
+}
 
-	if (other) {
-		reset(clone(other.get()));
-	}
-	else reset();
+template<class Base, class CopyDeletePolicy>
+inline poly<Base, CopyDeletePolicy>::poly(poly&& other) noexcept :
+	policy(std::move(static_cast<policy&>(other))),
+	data(other.release()) {
+}
+
+template<class Base, class CopyDeletePolicy>
+inline poly<Base, CopyDeletePolicy>& 
+poly<Base, CopyDeletePolicy>::operator=(const poly& other) {
+	policy::operator=(other);
+
+	reset();
+	if (other) data = clone(other.get());
 	
 	return *this;
 }
 
-template<class Base, template<class> class CopyPolicy>
-inline constexpr poly<Base, CopyPolicy>::poly(std::nullptr_t) noexcept :
+template<class Base, class CopyDeletePolicy>
+inline poly<Base, CopyDeletePolicy>&
+poly<Base, CopyDeletePolicy>::operator=(poly&& other) noexcept {
+	policy::operator=(std::move(other));
+
+	reset();
+	data = other.release();
+
+	return *this;
+}
+
+
+template<class Base, class CopyDeletePolicy>
+inline constexpr poly<Base, CopyDeletePolicy>::poly(std::nullptr_t) noexcept :
 	data(nullptr) {
 }
 
-template<class Base, template<class> class CopyPolicy>
-inline poly<Base, CopyPolicy>& 
-poly<Base, CopyPolicy>::operator=(std::nullptr_t) noexcept {
+template<class Base, class CopyDeletePolicy>
+inline poly<Base, CopyDeletePolicy>& 
+poly<Base, CopyDeletePolicy>::operator=(std::nullptr_t) noexcept {
 	data = nullptr;
 
 	return *this;
 }
 
-// Converting to const -----------------------------------------------------
+// Converting constructors -------------------------------------------------
 
-template<class Base, template<class> class CopyPolicy>
-template <class>
-poly<Base, CopyPolicy>::poly(const poly<typename
-	std::remove_const<Base>::type, CopyPolicy>& other) :
-	copy_policy(other.get_policy()),
+template<class Base, class CopyDeletePolicy>
+template<class Base2, class CopyDeletePolicy2>
+inline poly<Base, CopyDeletePolicy>::
+poly(const poly<Base2, CopyDeletePolicy2>& other) :
+	policy(other.get_policy()),
 	data(nullptr) {
-
-	if (other) {
-		reset(clone(other.get()));
-	}
+	if (other) data = clone(other.get());
 }
 
-template<class Base, template<class> class CopyPolicy>
-template <class>
-poly<Base, CopyPolicy>::poly(poly<typename
-	std::remove_const<Base>::type, CopyPolicy>&& other) noexcept :
-	copy_policy(std::move(other.get_policy())),
+template<class Base, class CopyDeletePolicy>
+template<class Base2, class CopyDeletePolicy2>
+inline poly<Base, CopyDeletePolicy>::
+poly(poly<Base2, CopyDeletePolicy2>&& other) noexcept :
+	policy(std::move(other.get_policy())),
 	data(other.release()) {
-}
-
-template<class Base, template<class> class CopyPolicy>
-template <class>
-poly<Base, CopyPolicy>& poly<Base, CopyPolicy>::operator=(const poly<typename
-	std::remove_const<Base>::type, CopyPolicy>& other) {
-	copy_policy::operator=(other.get_policy());
-
-	if (other) {
-		reset(clone(other.get()));
-	}
-	else reset();
-
-	return *this;
-}
-
-template<class Base, template<class> class CopyPolicy>
-template <class>
-poly<Base, CopyPolicy>& poly<Base, CopyPolicy>::operator=(poly<typename
-	std::remove_const<Base>::type, CopyPolicy>&& other) noexcept {
-	copy_policy::operator=(other);
-
-	reset(other.release());
-
-	return *this;
 }
 
 // From a pointer ----------------------------------------------------------
 
-template<class Base, template<class> class CopyPolicy>
+template<class Base, class CopyDeletePolicy>
 template<class Derived>
-inline poly<Base, CopyPolicy>::poly(Derived* obj) :
-	copy_policy(obj),
+inline poly<Base, CopyDeletePolicy>::poly(Derived* obj) :
+	policy(obj),
 	data(obj) {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly: poly can only be built using types, derived from Base");
+	if (typeid(*obj) != typeid(Derived))
+		throw std::runtime_error(
+			std::string("poly: passed pointer of type '") +
+			POLY_TYPE_NAME(Derived) +
+			"' must hold an object of exacly that type (not '" +
+			POLY_TYPE_NAME(*obj));
 
 	detail::inheritance_traits<Base, Derived>::set_offset(get(), obj);
 }
 
-template<class Base, template<class> class CopyPolicy>
+template<class Base, class CopyDeletePolicy>
 template<class Derived>
-inline poly<Base, CopyPolicy>& 
-poly<Base, CopyPolicy>::operator=(Derived* obj) {
+inline poly<Base, CopyDeletePolicy>& 
+poly<Base, CopyDeletePolicy>::operator=(Derived* obj) {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly: poly can only be built using types, derived from Base");
+	if (typeid(*obj) != typeid(Derived))
+		throw std::runtime_error(
+			std::string("poly: passed pointer of type '") +
+			POLY_TYPE_NAME(Derived) +
+			"' must hold an object of exacly that type (not '" +
+			POLY_TYPE_NAME(*obj));
 
 	reset(obj);
 	detail::inheritance_traits<Base, Derived>::set_offset(get(), obj);
 }
 
+// Destruction -------------------------------------------------------------
+
+template<class Base, class CopyDeletePolicy>
+inline poly<Base, CopyDeletePolicy>::~poly() {
+	if (data) destroy(get());
+}
+
 // Observers ===============================================================
-template<class Base, template<class> class CopyPolicy>
+template<class Base, class CopyDeletePolicy>
 template<class T>
-constexpr bool poly<Base, CopyPolicy>::is() const noexcept {
+constexpr bool poly<Base, CopyDeletePolicy>::is() const noexcept {
 	return get() != nullptr && typeid(*get()) == typeid(T);
 }
 
-template<class Base, template<class> class CopyPolicy>
-constexpr poly<Base, CopyPolicy>::operator bool() const noexcept {
+template<class Base, class CopyDeletePolicy>
+constexpr poly<Base, CopyDeletePolicy>::operator bool() const noexcept {
 	return static_cast<bool>(data);
 }
 
-template<class Base, template<class> class CopyPolicy>
-inline Base* poly<Base, CopyPolicy>::release() noexcept {
-	return data.release();
+template<class Base, class CopyDeletePolicy>
+inline Base* poly<Base, CopyDeletePolicy>::release() noexcept {
+	Base* rslt = data;
+	data = nullptr;
+
+	return rslt;
 }
 
-template<class Base, template<class> class CopyPolicy>
-inline void poly<Base, CopyPolicy>::reset(std::nullptr_t) noexcept {
-	data.reset();
+template<class Base, class CopyDeletePolicy>
+inline void poly<Base, CopyDeletePolicy>::reset(std::nullptr_t) noexcept {
+	if (data) {
+		destroy(data);
+		data = nullptr;
+	}
 }
 
-template<class Base, template<class> class CopyPolicy>
+template<class Base, class CopyDeletePolicy>
 template<class Derived>
-inline void poly<Base, CopyPolicy>::reset(Derived* obj) noexcept {
+inline void poly<Base, CopyDeletePolicy>::reset(Derived* obj) {
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly: poly can only be built using types, derived from Base");
+	if (typeid(*obj) != typeid(Derived))
+		throw std::runtime_error(
+			std::string("poly: passed pointer of type '") +
+			POLY_TYPE_NAME(Derived) +
+			"' must hold an object of exacly that type (not '" +
+			POLY_TYPE_NAME(*obj));
 
-	data.reset(obj);
-
+	if (data) destroy(data);
+	data = obj;
 	detail::inheritance_traits<Base, Derived>::set_offset(get(), obj);
 }
 
-template<class Base, template<class> class CopyPolicy>
-inline Base& poly<Base, CopyPolicy>::operator*() const {
+template<class Base, class CopyDeletePolicy>
+inline Base& poly<Base, CopyDeletePolicy>::operator*() const {
 	return *data;
 }
 
-template<class Base, template<class> class CopyPolicy>
-inline Base* poly<Base, CopyPolicy>::operator->() const noexcept {
-	return  data.get();
+template<class Base, class CopyDeletePolicy>
+inline Base* poly<Base, CopyDeletePolicy>::operator->() const noexcept {
+	return data;
+}
+
+template<class Base, class CopyDeletePolicy>
+inline Base* poly<Base, CopyDeletePolicy>::get() const noexcept {
+	return data;
 }
 
 // Member access ===========================================================
-template<class Base, template<class> class CopyPolicy>
-inline Base* poly<Base, CopyPolicy>::get() const noexcept {
-	return data.get();
+template<class Base, class CopyDeletePolicy>
+inline typename poly<Base, CopyDeletePolicy>::policy 
+poly<Base, CopyDeletePolicy>::get_policy() const noexcept {
+	return static_cast<policy>(*this);
 }
 
-template<class Base, template <class> class CopyPolicy>
-inline typename poly<Base, CopyPolicy>::copy_policy 
-poly<Base, CopyPolicy>::get_policy() const noexcept {
-	return static_cast<copy_policy>(*this);
-}
-
-template<class Base, template<class> class CopyPolicy>
+template<class Base, class CopyDeletePolicy>
 template<class T>
-T* poly<Base, CopyPolicy>::as() const noexcept {
+T* poly<Base, CopyDeletePolicy>::as() const noexcept {
 	static_assert(std::is_base_of<Base, T>::value,
 		"poly: cannot interpret as class not derived from Base");
 
 	if (is<T>()) {
-		return detail::inheritance_traits<Base, T>::downcast(data.get());
+		return detail::inheritance_traits<Base, T>::downcast(get());
 	}
 	return nullptr;
 }
 
-template <class Base, class Derived,
-	class... Args>
-	inline poly<Base> make_poly(Args&&... args) {
-	return poly<Base>(
-		new Derived(std::forward<Args>(args)...));
+// Non-member functions ========================================================
+
+template<class PolyType, class Derived, class... Args>
+PolyType make(Args&&... args) {
+	return PolyType(new Derived(std::forward<Args>(args)...));
 }
 
-template <class Base, template<class> class CopyPolicy, class Derived,
-	class... Args>
-	inline poly<Base, CopyPolicy> make_poly(Args&&... args) {
-	return poly<Base, CopyPolicy>(
-		new Derived(std::forward<Args>(args)...));
-}
-
-template <
-	class NewBase, class Derived,
-	class OldBase, template<class> class CopyPolicy>
-	inline poly<NewBase, CopyPolicy>
-	transform_poly(const poly<OldBase, CopyPolicy>& other) {
-	return transform_poly<NewBase, CopyPolicy, Derived>(other);
-}
-
-template <
-	class NewBase, template<class> class NewCopyPolicy, class Derived,
-	class OldBase, template<class> class OldCopyPolicy>
-	inline poly<NewBase, NewCopyPolicy>
-	transform_poly(const poly<OldBase, OldCopyPolicy>& other) {
+template<class PolyType, class Derived, class OldBase, class CopyDeletePolicy>
+PolyType transform(const poly<OldBase, CopyDeletePolicy>& other) {
 	if (other) {
-		return poly<NewBase, NewCopyPolicy>(
+		return PolyType(
 			new Derived(*other.template as<Derived>()));
 	}
-	return poly<NewBase, NewCopyPolicy>();
+	return PolyType();
 }
 
-template <
-	class NewBase, class Derived,
-	class OldBase, template<class> class CopyPolicy>
-	inline poly<NewBase, CopyPolicy>
-	transform_poly(poly<OldBase, CopyPolicy>&& other) {
-	return transform_poly<NewBase, CopyPolicy, Derived>(std::move(other));
-}
-
-template <
-	class NewBase, template<class> class NewCopyPolicy, class Derived,
-	class OldBase, template<class> class OldCopyPolicy>
-	inline poly<NewBase, NewCopyPolicy>
-	transform_poly(poly<OldBase, OldCopyPolicy>&& other) {
+template<class PolyType, class Derived, class OldBase, class CopyDeletePolicy>
+PolyType transform(poly<OldBase, CopyDeletePolicy>&& other) {
 	Derived* temp = other.template as<Derived>();
-	return poly<NewBase, NewCopyPolicy>(temp);
 	other.release();
+	
+	return PolyType(temp);
 }
 
 // Comparison operators ========================================================
-
-//template<class T1, class D1, class T2, class D2>
-//bool operator!=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);
 
 namespace detail {
 
@@ -255,23 +245,17 @@ struct defines_type<
 
 } // namespace detail
 
-template<
-	class B1, template <class> class C1,
-	class B2, template <class> class C2>
+template<class B1, class C1, class B2, class C2>
 	bool operator==(const poly<B1, C1>& x, const poly<B2, C2>& y) {
 	return x.get() == y.get();
 }
 
-template<
-	class B1, template <class> class C1,
-	class B2, template <class> class C2>
+template<class B1, class C1, class B2, class C2>
 	bool operator!=(const poly<B1, C1>& x, const poly<B2, C2>& y) {
 	return !(x == y);
 }
 
-template<
-	class B1, template <class> class C1,
-	class B2, template <class> class C2>
+template<class B1, class C1, class B2, class C2>
 	bool operator<(const poly<B1, C1>& x, const poly<B2, C2>& y) {
 	using common = std::common_type<poly<B1, C1>::base_type*, poly<B2, C2>::base_type*>;
 	static_assert(detail::defines_type<common>::value, 
@@ -280,95 +264,89 @@ template<
 	return std::less<common::type>()(x.get(), y.get());
 }
 
-template<
-	class B1, template <class> class C1,
-	class B2, template <class> class C2>
-	bool operator<=(const poly<B1, C1>& x, const poly<B2, C2>& y) {
+template<class B1, class P1, class B2, class P2>
+	bool operator<=(const poly<B1, P1>& x, const poly<B2, P2>& y) {
 	return !(y < x);
 }
 
-template<
-	class B1, template <class> class C1,
-	class B2, template <class> class C2>
-	bool operator>(const poly<B1, C1>& x, const poly<B2, C2>& y) {
+template<class B1, class P1, class B2, class P2>
+	bool operator>(const poly<B1, P1>& x, const poly<B2, P2>& y) {
 	return y < x;
 }
 
-template<
-	class B1, template <class> class C1,
-	class B2, template <class> class C2>
-	bool operator>=(const poly<B1, C1>& x, const poly<B2, C2>& y) {
+template<class B1, class P1, class B2, class P2>
+	bool operator>=(const poly<B1, P1>& x, const poly<B2, P2>& y) {
 	return !(x < y);
 }
 
-template <class B, template <class> class C>
-bool operator==(const poly<B, C>& x, nullptr_t) noexcept {
+template <class B, class P>
+bool operator==(const poly<B, P>& x, nullptr_t) noexcept {
 	return !(x != nullptr);
 }
 
-template <class B, template <class> class C>
-bool operator==(nullptr_t, const poly<B, C>& x) noexcept {
+template <class B, class P>
+bool operator==(nullptr_t, const poly<B, P>& x) noexcept {
 	return !(nullptr != x);
 }
 
-template <class B, template <class> class C>
-bool operator!=(const poly<B, C>& x, nullptr_t) noexcept {
+template <class B, class P>
+bool operator!=(const poly<B, P>& x, nullptr_t) noexcept {
 	return static_cast<bool>(x);
 }
 
-template <class B, template <class> class C>
-bool operator!=(nullptr_t, const poly<B, C>& x) noexcept {
+template <class B, class P>
+bool operator!=(nullptr_t, const poly<B, P>& x) noexcept {
 	return static_cast<bool>(x);
 }
 
-template <class B, template <class> class C>
-bool operator<(const poly<B, C>& x, nullptr_t) {
-	return std::less<poly<B, C>::base_type*>()(x.get(), nullptr);
+template <class B, class P>
+bool operator<(const poly<B, P>& x, nullptr_t) {
+	return std::less<poly<B, P>::base_type*>()(x.get(), nullptr);
 }
 
-template <class B, template <class> class C>
-bool operator<(nullptr_t, const poly<B, C>& y) {
-	return std::less<poly<B, C>::base_type*>()(nullptr, y.get());
+template <class B, class P>
+bool operator<(nullptr_t, const poly<B, P>& y) {
+	return std::less<poly<B, P>::base_type*>()(nullptr, y.get());
 }
 
-template <class B, template <class> class C>
-bool operator<=(const poly<B, C>& x, nullptr_t) {
+template <class B, class P>
+bool operator<=(const poly<B, P>& x, nullptr_t) {
 	return !(nullptr < x);
 }
 
-template <class B, template <class> class C>
-bool operator<=(nullptr_t, const poly<B, C>& y) {
+template <class B, class P>
+bool operator<=(nullptr_t, const poly<B, P>& y) {
 	return !(y < nullptr);
 }
 
-template <class B, template <class> class C>
-bool operator>(const poly<B, C>& x, nullptr_t) {
+template <class B, class P>
+bool operator>(const poly<B, P>& x, nullptr_t) {
 	return nullptr < x;
 }
 
-template <class B, template <class> class C>
-bool operator>(nullptr_t, const poly<B, C>& y) {
+template <class B, class P>
+bool operator>(nullptr_t, const poly<B, P>& y) {
 	return y < nullptr;
 }
 
-template <class B, template <class> class C>
-bool operator>=(const poly<B, C>& x, nullptr_t) {
+template <class B, class P>
+bool operator>=(const poly<B, P>& x, nullptr_t) {
 	return !(x < nullptr);
 }
 
-template <class B, template <class> class C>
-bool operator>=(nullptr_t, const poly<B, C>& y) {
+template <class B, class P>
+bool operator>=(nullptr_t, const poly<B, P>& y) {
 	return !(nullptr < y);
 }
 
-} // namespace zhukov
+} // namespace pl
 
 namespace std {
 
-template<class Base, template<class> class CopyPolicy>
-struct hash<zhukov::poly<Base, CopyPolicy>> {
-	size_t operator()(const zhukov::poly<Base, CopyPolicy>& x) const {
-		return hash<zhukov::poly<Base, CopyPolicy>::base_type*>()(x.get());
+template<class Base, class CopyDeletePolicy>
+struct hash<pl::poly<Base, CopyDeletePolicy>> {
+	size_t operator()(const pl::poly<Base, CopyDeletePolicy>& x) const {
+		return hash<pl::poly<Base, CopyDeletePolicy>::base_type*>()(x.get());
 	}
 };
 

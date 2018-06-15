@@ -22,7 +22,7 @@ or poly_factory.hpp.
 #define POLY_TYPE_NAME(...) typeid(__VA_ARGS__).name()
 #endif
 
-namespace zhukov {
+namespace pl {
 namespace detail {
 
 template <class Base, class Derived>
@@ -48,6 +48,6 @@ class inheritance_traits : public inheritance_traits_impl<
 };
 
 } // namespace detail
-} // namespace zhukov
+} // namespace pl
 
 #include "inheritance_traits.inl"

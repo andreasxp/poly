@@ -1,7 +1,7 @@
 #pragma once
 #include "inheritance_traits.hpp"
 
-namespace zhukov {
+namespace pl {
 namespace detail {
 
 template <class Base, class Derived>
@@ -28,4 +28,4 @@ inline const Derived* inheritance_traits_impl<Base, Derived>::downcast(const Bas
 }
 
 } // namespace detail
-} // namespace zhukov
+} // namespace pl
