@@ -35,6 +35,15 @@
     <ClInclude Include="include\inheritance_traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\compound.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\copy_policies.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\delete_policies.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\policy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -49,7 +58,13 @@
     <None Include="inline\inheritance_traits.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="inline\policy.inl">
+    <None Include="inline\compound.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="inline\copy_policies.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="inline\delete_policies.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

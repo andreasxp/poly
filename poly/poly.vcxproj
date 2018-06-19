@@ -131,6 +131,9 @@
     <ClCompile Include="src\tests.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\compound.hpp" />
+    <ClInclude Include="include\copy_policies.hpp" />
+    <ClInclude Include="include\delete_policies.hpp" />
     <ClInclude Include="include\policy.hpp" />
     <ClInclude Include="include\poly.hpp" />
     <ClInclude Include="include\inheritance_traits.hpp" />
@@ -138,7 +141,9 @@
     <ClInclude Include="include\tests.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="inline\policy.inl" />
+    <None Include="inline\compound.inl" />
+    <None Include="inline\copy_policies.inl" />
+    <None Include="inline\delete_policies.inl" />
     <None Include="inline\poly.inl" />
     <None Include="inline\inheritance_traits.inl" />
     <None Include="inline\poly_factory.inl" />

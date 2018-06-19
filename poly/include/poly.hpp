@@ -12,10 +12,10 @@
 
 namespace pl {
 
-template<class Base, class CopyDeletePolicy = unique<Base>>
+template<class Base, class CopyDeletePolicy = deep<Base>>
 class poly : private CopyDeletePolicy {
-	static_assert(std::has_virtual_destructor<Base>::value,
-		"poly: Base must have a virtual destructor");
+	static_assert(std::is_polymorphic<Base>::value,
+		"poly: Base is not polymorphic, poly is useless. Consider using std::unique_ptr instead.");
 public:
 	using base_type = Base;
 	using policy = CopyDeletePolicy;
