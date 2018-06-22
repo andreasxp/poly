@@ -69,7 +69,9 @@ public:
 	template <class T>
 	T* as() const noexcept;
 
-	policy get_policy() const noexcept;
+	// Friends =================================================================
+	template<class Base2, class CopyDeletePolicy2>
+	friend class poly;
 
 private:
 	Base* data;

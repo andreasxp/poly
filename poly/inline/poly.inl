@@ -66,7 +66,7 @@ template<class Base, class CopyDeletePolicy>
 template<class Base2, class CopyDeletePolicy2>
 inline poly<Base, CopyDeletePolicy>::
 poly(const poly<Base2, CopyDeletePolicy2>& other) :
-	policy(other.get_policy()),
+	policy(static_cast<CopyDeletePolicy2>(other)),
 	data(nullptr) {
 	if (other) data = clone(other.get());
 }
@@ -75,7 +75,7 @@ template<class Base, class CopyDeletePolicy>
 template<class Base2, class CopyDeletePolicy2>
 inline poly<Base, CopyDeletePolicy>::
 poly(poly<Base2, CopyDeletePolicy2>&& other) noexcept :
-	policy(std::move(other.get_policy())),
+	policy(std::move(static_cast<CopyDeletePolicy2>(other))),
 	data(other.release()) {
 }
 
@@ -183,12 +183,6 @@ inline Base* poly<Base, CopyDeletePolicy>::get() const noexcept {
 }
 
 // Member access ===========================================================
-template<class Base, class CopyDeletePolicy>
-inline typename poly<Base, CopyDeletePolicy>::policy 
-poly<Base, CopyDeletePolicy>::get_policy() const noexcept {
-	return static_cast<policy>(*this);
-}
-
 template<class Base, class CopyDeletePolicy>
 template<class T>
 T* poly<Base, CopyDeletePolicy>::as() const noexcept {
