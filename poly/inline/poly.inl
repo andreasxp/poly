@@ -46,7 +46,6 @@ poly<Base, CopyDeletePolicy>::operator=(poly&& other) noexcept {
 	return *this;
 }
 
-
 template<class Base, class CopyDeletePolicy>
 inline constexpr poly<Base, CopyDeletePolicy>::poly(std::nullptr_t) noexcept :
 	data(nullptr) {
@@ -123,6 +122,7 @@ inline poly<Base, CopyDeletePolicy>::~poly() {
 }
 
 // Observers ===============================================================
+
 template<class Base, class CopyDeletePolicy>
 template<class T>
 constexpr bool poly<Base, CopyDeletePolicy>::is() const noexcept {
@@ -183,6 +183,7 @@ inline Base* poly<Base, CopyDeletePolicy>::get() const noexcept {
 }
 
 // Member access ===========================================================
+
 template<class Base, class CopyDeletePolicy>
 template<class T>
 T* poly<Base, CopyDeletePolicy>::as() const noexcept {
