@@ -10,26 +10,42 @@ using namespace std;
 #define TEST(...) print_test_result(#__VA_ARGS__, __VA_ARGS__)
 
 void Tester::print_test_result(const std::string& name, bool result) {
-	string spacer(80 - 5 - name.size(), ' ');
+	string spacer(80 - 5 - (name.size() < 75 ? name.size() : 0), ' ');
 	cerr << std::boolalpha <<
-		name << spacer << result << endl;
+		name << (name.size() >= 75 ? "\n" : "") <<
+		spacer << result << endl;
 }
+
+struct uq {
+	uq() = default;
+	template <class T>
+	uq(const T* other) {};
+
+	template <class T>
+	void destroy(T* other) {
+		delete other;
+	}
+};
 
 void Tester::run() {
 	// poly ====================================================================
 	{
-		poly<Base> p0(new Der);
-		poly<Base> p1(std::move(p0));
-		auto p2 = pl::make<poly<Base, pl::deep<Base>>, Der>();
+		auto p10 = pl::make<poly<Mid2, uq>, Der>();
+		poly<Base, uq> p11 = std::move(p10);
+		cerr << p11.as<Der>()->der_name << endl; // BUG, FIX!
+
+		poly<Base, pl::unique<Base>> p0(new Der);
+		poly<Base, pl::unique<Base>> p1(std::move(p0));
+		auto p2 = pl::make<poly<Base>, Der>();
 		auto p3 = pl::transform<poly<Mid1>, Der>(p2);
-		auto p4 = pl::transform<poly<Mid2, pl::deep<Base>>, Der>(p3);
+		auto p4 = pl::transform<poly<Mid2>, Der>(p3);
 		
-		auto p5 = pl::make<poly<Base, pl::deep<Base>>, Der>();
-		poly<const Base, pl::deep<const Base>> p6(p5);
-		poly<const Base, pl::deep<const Base>> p7;
+		auto p5 = pl::make<poly<Base>, Der>();
+		poly<const Base> p6(p5);
+		poly<const Base> p7;
 		p7 = p5;
-		poly<const Base, pl::deep<const Base>> p8(std::move(p5));
-		poly<const Base, pl::deep<const Base>> p9;
+		poly<const Base> p8(std::move(p5));
+		poly<const Base> p9;
 		p9 = std::move(p7);
 
 		static_assert(sizeof(poly<Base, pl::unique<Base>>) == sizeof(Base*), "EBO failed");
@@ -89,7 +105,7 @@ void Tester::run() {
 		TEST(nullptr >= p0);
 		TEST(p0 >= nullptr);
 
-		TEST(std::hash<poly<Base>>()(p1) == std::hash<Base*>()(p1.get()));
+		TEST(std::hash<poly<Base, pl::unique<Base>>>()(p1) == std::hash<Base*>()(p1.get()));
 	}
 
 	// poly_factory ============================================================
