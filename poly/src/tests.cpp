@@ -30,10 +30,6 @@ struct uq {
 void Tester::run() {
 	// poly ====================================================================
 	{
-		auto p10 = pl::make<poly<Mid2, uq>, Der>();
-		poly<Base, uq> p11 = std::move(p10);
-		cerr << p11.as<Der>()->der_name << endl; // BUG, FIX!
-
 		poly<Base, pl::unique<Base>> p0(new Der);
 		poly<Base, pl::unique<Base>> p1(std::move(p0));
 		auto p2 = pl::make<poly<Base>, Der>();

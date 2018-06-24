@@ -9,6 +9,7 @@
 #include <utility>     // forward
 
 #include "policy.hpp"
+#include "cv_checks.hpp"
 
 namespace pl {
 
@@ -32,10 +33,14 @@ public:
 	poly& operator=(std::nullptr_t) noexcept;
 
 	// Converting constructors -------------------------------------------------
-	template <class Base2, class CopyDeletePolicy2>
+	template <class Base2, class CopyDeletePolicy2, 
+		class = typename std::enable_if<
+		detail::is_stronger_qualified<Base, Base2>::value>::type>
 	poly(const poly<Base2, CopyDeletePolicy2>& other);
 
-	template <class Base2, class CopyDeletePolicy2>
+	template <class Base2, class CopyDeletePolicy2,
+		class = typename std::enable_if<
+		detail::is_stronger_qualified<Base, Base2>::value>::type>
 	poly(poly<Base2, CopyDeletePolicy2>&& other) noexcept;
 
 	// From a pointer ----------------------------------------------------------

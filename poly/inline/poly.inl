@@ -62,7 +62,7 @@ poly<Base, CopyDeletePolicy>::operator=(std::nullptr_t) noexcept {
 // Converting constructors -------------------------------------------------
 
 template<class Base, class CopyDeletePolicy>
-template<class Base2, class CopyDeletePolicy2>
+template<class Base2, class CopyDeletePolicy2, class>
 inline poly<Base, CopyDeletePolicy>::
 poly(const poly<Base2, CopyDeletePolicy2>& other) :
 	policy(static_cast<CopyDeletePolicy2>(other)),
@@ -71,7 +71,7 @@ poly(const poly<Base2, CopyDeletePolicy2>& other) :
 }
 
 template<class Base, class CopyDeletePolicy>
-template<class Base2, class CopyDeletePolicy2>
+template<class Base2, class CopyDeletePolicy2, class>
 inline poly<Base, CopyDeletePolicy>::
 poly(poly<Base2, CopyDeletePolicy2>&& other) noexcept :
 	policy(std::move(static_cast<CopyDeletePolicy2>(other))),
