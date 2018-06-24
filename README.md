@@ -141,26 +141,30 @@ The class satisfies the requirements of MoveConstructible, MoveAssignable, and C
 #### Member functions
 ##### Constructors and assignment operators
 ```c++
-constexpr poly() noexcept;                            | (1)
-constexpr poly(std::nullptr_t) noexcept;              | 
-poly& operator=(std::nullptr_t) noexcept;             |
------------------------------------------------------------
-poly(const poly& other);                              | (2)
-poly& operator=(const poly& other);                   |        
------------------------------------------------------------
-poly(poly&&) noexcept;                                | (3)
-poly& operator=(poly&&) noexcept;                     |	
------------------------------------------------------------
-template <class Base2, class CopyDeletePolicy2>       | (4)
-poly(const poly<Base2, CopyDeletePolicy2>& other);    |
------------------------------------------------------------
-template <class Base2, class CopyDeletePolicy2>       | (5)
-poly(poly<Base2, CopyDeletePolicy2>&& other) noexcept;|
------------------------------------------------------------
-template <class Derived>                              | (6)
-explicit poly(Derived* obj);                          |    
-template <class Derived>                              |
-poly& operator=(Derived* obj);                        |      
+constexpr poly() noexcept;                                          | (1)
+constexpr poly(std::nullptr_t) noexcept;                            | 
+poly& operator=(std::nullptr_t) noexcept;                           |
+-------------------------------------------------------------------------
+poly(const poly& other);                                            | (2)
+poly& operator=(const poly& other);                                 |        
+-------------------------------------------------------------------------
+poly(poly&&) noexcept;                                              | (3)
+poly& operator=(poly&&) noexcept;                                   |	
+-------------------------------------------------------------------------
+template <class Base2, class CopyDeletePolicy2,                     | (4)
+    class = typename std::enable_if<                                |
+	detail::is_stronger_qualified<Base, Base2>::value>::type>>      |
+poly(const poly<Base2, CopyDeletePolicy2>& other);                  |
+-------------------------------------------------------------------------
+template <class Base2, class CopyDeletePolicy2,                     | (5)
+    class = typename std::enable_if<                                |
+	detail::is_stronger_qualified<Base, Base2>::value>::type>>      |
+poly(poly<Base2, CopyDeletePolicy2>&& other) noexcept;              |
+-------------------------------------------------------------------------
+template <class Derived>                                            | (6)
+explicit poly(Derived* obj);                                        |    
+template <class Derived>                                            |
+poly& operator=(Derived* obj);                                      |      
 ```
 1. Constructs an empty `poly` that owns nothing. Default-constructs the internal policy object.
 2. Copy-constructs `poly` from another poly. Internal policy is copied, and the internal pointer is *cloned* using the policy's `clone` method.
