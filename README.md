@@ -91,8 +91,7 @@ class my_policy {
     void destroy(T* ptr); //Destroys the object held by ptr.
 };
 ```
-You can also group copy- and delete policies with `pl::compound`. See the #documentation for more details.
-
+You can also group copy- and delete policies with `pl::compound`. See the [documentation](#documentation) for more details.
 
 *Note: if `poly` is copyable but the derived object is not, on copy a runtime exception will occur.*
 
@@ -167,17 +166,99 @@ template <class Derived>                                            |
 poly& operator=(Derived* obj);                                      |      
 ```
 1. Constructs an empty `poly` that owns nothing. Default-constructs the internal policy object.
-2. Copy-constructs `poly` from another poly. Internal policy is copied, and the internal pointer is *cloned* using the policy's `clone` method.
-3. Move-constructs `poly` from another poly. Internal policy is moved, and the internal pointer simply move as pointer (shallow move).
-4. Copy-constructs `poly` from a different poly. This converting constructor is enabled if new base is more strongly qualified than old base. For example, using this contructor, poly<const Base> is implicitly constructible from poly<Base>, but not poly<volatile Base>.
-5. Move-constructs `poly` from a different poly. Same rules as for (4) apply.
+2. Copy-constructs `poly` from another `poly`. Internal policy is copied, and the internal pointer is *cloned* using the policy's `clone` method.
+3. Move-constructs `poly` from another `poly`. Internal policy is moved, and the internal pointer simply move as pointer (shallow move).
+4. Copy-constructs `poly` from a different `poly`. This converting constructor is enabled if new base is more strongly qualified than old base. For example, using this contructor, `poly<const Base>` is implicitly constructible from `poly<Base>`, but not `poly<volatile Base>`.
+5. Move-constructs `poly` from a different `poly`. Same rules as for (4) apply.
 6. Constructs a poly by adopting a raw pointer to a derived class. Besides pointing to a class, derived from Base, the pointer must also *not* be a polymorhphic pointer to a different object (i.e. `Derived*` that points to `struct Derived2 : Derived`). Attemping to adopt such a pointer will result in a runtime exception.
 ##### Destructor
 ```c++
 ~poly();
 ```
 Destructs the managed pointer using selected policy's `destroy()` function.
+##### Observers
+```c++
+template <class T> constexpr bool is() const noexcept;
+```
+Checks if the stored pointer holds an object is of type `T`. Returns `true` if it does, `false` otherwise.
+```c++
+explicit constexpr operator bool() const noexcept;
+```
+Checks whether `poly` owns an object, i.e. whether `get() != nullptr`. Returns `true` if it does, `false` otherwise.
+##### Modifiers
+```c++
+template <class Derived>                         | (1)
+void reset(Derived* ptr);                        |
+-------------------------------------------------------
+void reset(std::nullptr_t = nullptr) noexcept;   | (2)
+```
+1. Destructs the managed pointer using selected policy's `destroy()` function, and replaces it with `ptr`. For `ptr`, same constraints as in constructor (6) apply.
+2. Destructs the managed pointer using selected policy's `destroy()` function, and replaces it with `nullptr`.
+```c++
+Base* release() noexcept;
+```
+Releases the ownership of the managed object if any. `get()` returns `nullptr` after the call. Returns pointer to the managed object as `Base*` or `nullptr` if there was no managed object, i.e. the value which would be returned by `get()` before the call.
+##### Member access
+```c++
+Base& operator*() const;             | (1)
+-------------------------------------------
+Base* operator->() const noexcept;   | (2)
+Base* get() const noexcept;          |
+```
+1. Returns the object owned by `poly`, equivalent to `*get()`. The object must not be empty, otherwise this operation results in undefined behavior.
+2. Returns the managed pointer, or `nullptr` if no object is owned.
+```c++
+template <class T>
+T* as() const noexcept;
+```
+Returns a pointer to the object owned by `poly` in the exact type of that object. Returns `nullptr` if the stored object is not of type `T` or if `poly` is empty.
 
-Work in progress.
+*Note: This function is not the same as dynamic_cast. First, types must match exactly, i.e. no up- or side-casting is allowed. Second, perfomance of this function is much better than of dynamic_cast, as no type tree traversal is performed.*
+### `class factory`
+```c++
+template <class Base, class CopyDeletePolicy = deep<Base>>
+class factory;
+```
+`factory` is a class that registers and creates `poly` objects using strings as identifiers.  
+By default, when a type is registered, a string identifier is generated using `std::type_info::name`, but this behavior can be overridden by defining a macro `POLY_CUSTOM_TYPE_NAME(type)` that accepts a type token and retuns a value of type `const cher*` or `std::string`. This macro must be defined before including `poly.hpp`.
+Example of a custom name generator using [prindex](https://github.com/andreasxp/prindex) library:
+```c++
+#include "prindex.hpp"
+// Using __VA_ARGS__ is recommended to elide the commas that can appear in templated types.
+#define POLY_CUSTOM_TYPE_NAME(...) prid<__VA_ARGS__>().name()
+#include "poly.hpp"
+```
+Usage example:
+```c++
+pl::factory<Base> f;
+f.insert<Mid1>();
+f.insert<Mid2>();
+f.insert<Der>();
+
+auto p = f.make("struct Der"); //MSVC
+//auto p = f.make("Der"); //GCC or Clang (or prindex)
+
+auto ls = f.list();
+for (auto& i : ls) std::cout << i << std::endl;
+```
+Possible output:
+```
+struct Der
+struct Mid1
+struct Mid2
+```
+#### Member functions
+```c++
+template <class Derived> void insert();
+```
+Inserts the type `Derived` into the factory. This function must be called at least once before `poly<Derived>` can be made with this instance of the factory.
+```c++
+std::vector<std::string> list() const;
+```
+Returns a list of all types, registered in the factory, as a `std::vector` of `std::string`s that are used to `make` objects.
+```c++
+poly<Base, CopyDeletePolicy> make(const std::string& name) const;
+```
+Makes a `poly<Base, CopyDeletePolicy>`, holding a type, represented by the string `name`. The required type must be registered using `insert` before a `poly` of that type can be made. If no such type is registered, a runtime exception is thrown.
 ## License
 This project is licenced under the MIT licence. It is free for personal and commercial use.
