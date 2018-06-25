@@ -19,6 +19,17 @@ void Tester::print_test_result(const std::string& name, bool result) {
 void Tester::run() {
 	// poly ====================================================================
 	{
+		pl::factory<Base> f;
+		f.insert<Mid1>();
+		f.insert<Mid2>();
+		f.insert<Der>();
+
+		auto p = f.make("struct Der"); //MSVC
+		//auto p = f.make("Der"); //GCC or Clang
+
+		auto ls = f.list();
+		for (auto& i : ls) cout << i << std::endl;
+
 		poly<Base, pl::unique<Base>> p0(new Der);
 		poly<Base, pl::unique<Base>> p1(std::move(p0));
 		auto p2 = pl::make<poly<Base>, Der>();
