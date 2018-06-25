@@ -16,17 +16,6 @@ void Tester::print_test_result(const std::string& name, bool result) {
 		spacer << result << endl;
 }
 
-struct uq {
-	uq() = default;
-	template <class T>
-	uq(const T* other) {};
-
-	template <class T>
-	void destroy(T* other) {
-		delete other;
-	}
-};
-
 void Tester::run() {
 	// poly ====================================================================
 	{
@@ -66,6 +55,7 @@ void Tester::run() {
 		TEST(!p3.is<Base>());
 		TEST(!p4.is<Base>());
 
+		TEST(p0.as<Der>() == nullptr);
 		TEST(p1.as<Der>() != nullptr);
 		TEST(p2.as<Der>() != nullptr);
 		TEST(p3.as<Der>() != nullptr);

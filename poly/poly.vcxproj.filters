@@ -26,9 +26,6 @@
     <ClInclude Include="include\poly.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\poly_factory.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\tests.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -50,12 +47,12 @@
     <ClInclude Include="include\cv_checks.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\factory.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="inline\poly.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="inline\poly_factory.inl">
       <Filter>Header Files</Filter>
     </None>
     <None Include="inline\inheritance_traits.inl">
@@ -68,6 +65,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="inline\delete_policies.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="inline\factory.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

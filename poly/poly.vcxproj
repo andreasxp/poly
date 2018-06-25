@@ -138,7 +138,7 @@
     <ClInclude Include="include\policy.hpp" />
     <ClInclude Include="include\poly.hpp" />
     <ClInclude Include="include\inheritance_traits.hpp" />
-    <ClInclude Include="include\poly_factory.hpp" />
+    <ClInclude Include="include\factory.hpp" />
     <ClInclude Include="include\tests.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -147,7 +147,7 @@
     <None Include="inline\delete_policies.inl" />
     <None Include="inline\poly.inl" />
     <None Include="inline\inheritance_traits.inl" />
-    <None Include="inline\poly_factory.inl" />
+    <None Include="inline\factory.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

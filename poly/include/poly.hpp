@@ -59,12 +59,11 @@ public:
 	explicit constexpr operator bool() const noexcept;
 
 	// Modifiers ===============================================================
-	Base* release() noexcept;
-	void reset(std::nullptr_t = nullptr) noexcept;
-
-	// Enabled only if Derived is more const than Base
 	template <class Derived>
 	void reset(Derived* obj);
+	void reset(std::nullptr_t = nullptr) noexcept;
+
+	Base* release() noexcept;
 
 	// Member access ===========================================================
 	Base& operator*() const;
