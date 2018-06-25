@@ -3,8 +3,10 @@
 
 namespace pl {
 
+/// Empty class. Provides no operator(), so a policy is not copyable.
 class no_copy {};
 
+/// Stores a pointer to a function that copies the Base pointer
 template <class Base>
 class deep_copy {
 public:

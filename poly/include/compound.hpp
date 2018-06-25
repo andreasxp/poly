@@ -1,6 +1,8 @@
 #pragma once
 #include <type_traits> // is_constructible
 
+// MSVC fails to optimize using EBO by default.
+// This macro enables the optimization
 #ifdef _MSC_VER
 #define POLY_MULTIPLE_EMPTY_BASES __declspec(empty_bases)
 #else
@@ -49,5 +51,7 @@ private:
 };
 
 } // namespace pl
+
+#undef POLY_MULTIPLE_EMPTY_BASES
 
 #include "compound.inl"

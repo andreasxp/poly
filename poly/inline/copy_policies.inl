@@ -5,6 +5,7 @@
 namespace pl {
 namespace detail {
 
+/// Casts Base* to Derived* using inheritance_traits and copies it
 template<class Base, class Derived>
 inline typename std::enable_if<
 	std::is_copy_constructible<Derived>::value, Base*>::type
@@ -15,6 +16,7 @@ inline typename std::enable_if<
 	return static_cast<Base*>(rslt);
 }
 
+/// Placeholder for when Derived is not CopyConstructible. Throws on call.
 template<class Base, class Derived>
 inline typename std::enable_if<
 	!std::is_copy_constructible<Derived>::value, Base*>::type // Note the !

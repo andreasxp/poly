@@ -5,6 +5,7 @@
 namespace pl {
 namespace detail {
 
+/// Casts Base* to Derived* using inheritance_traits and deletes it
 template<class Base, class Derived>
 inline void	destroy(const Base* other) {
 	const Derived* temp = inheritance_traits<Base, Derived>::downcast(other);

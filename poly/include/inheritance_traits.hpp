@@ -4,8 +4,8 @@
 #include <type_traits> // is_base_of, remove_cv
 
 /*!
-\brief   Macro to override typeid for rtti in poly
-\details Define POLY_CUSTOM_RTTI(type) as a function that returns
+\brief Macro to override typeid for rtti in poly
+Define POLY_CUSTOM_RTTI(type) as a function that returns
 your type's name. Do this **before** including poly.hpp
 or factory.hpp.
 \example #define POLY_CUSTOM_RTTI(...) my_typeid(__VA_ARGS__).name();
@@ -13,6 +13,7 @@ or factory.hpp.
 \see     https://github.com/andreasxp/prindex
 */
 #ifdef POLY_CUSTOM_TYPE_NAME
+/// Get name of type
 #define POLY_TYPE_NAME POLY_CUSTOM_TYPE_NAME
 #else
 /// Get name of type
@@ -22,6 +23,7 @@ or factory.hpp.
 namespace pl {
 namespace detail {
 
+/// A class that can downcast Base to Derived without dynamic_cast
 template <class Base, class Derived>
 class inheritance_traits_impl {
 	static_assert(std::is_base_of<Base, Derived>::value,
@@ -33,6 +35,7 @@ public:
 	static const Derived* downcast(const Base* ptr);
 
 private:
+	/// Holds a memory offset that converts Base* to Derived*
 	static std::atomic<std::ptrdiff_t> offset;
 };
 

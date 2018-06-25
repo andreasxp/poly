@@ -3,6 +3,7 @@
 
 namespace pl {
 
+/// Holds a function that casts object to derived before deleting
 template <class Base>
 class pmr_delete {
 public:
