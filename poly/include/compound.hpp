@@ -9,13 +9,6 @@
 
 namespace pl {
 
-namespace detail {
-
-template <size_t>
-class tag {};
-
-} // namespace detail
-
 template <class Cloner, class Deleter>
 class POLY_MULTIPLE_EMPTY_BASES compound : private Cloner, private Deleter {
 public:
@@ -31,33 +24,8 @@ public:
 	// From a pointer ----------------------------------------------------------
 	// If a Cloner or Deleter is not constructible from a pointer, it will be 
 	// default-constrcted.
-	template <class T,
-		typename std::enable_if<
-		!std::is_constructible<Cloner, const T*>::value &&
-		!std::is_constructible<Deleter, const T*>::value,
-		detail::tag<0>*>::type = nullptr>
-		compound(const T*);
-
-	template <class T,
-		typename std::enable_if<
-		!std::is_constructible<Cloner, const T*>::value &&
-		std::is_constructible<Deleter, const T*>::value,
-		detail::tag<1>*>::type = nullptr>
-		compound(const T* ptr);
-
-	template <class T,
-		typename std::enable_if<
-		std::is_constructible<Cloner, const T*>::value &&
-		!std::is_constructible<Deleter, const T*>::value,
-		detail::tag<2>*>::type = nullptr>
-		compound(const T* ptr);
-
-	template <class T,
-		typename std::enable_if<
-		std::is_constructible<Cloner, const T*>::value &&
-		std::is_constructible<Deleter, const T*>::value,
-		detail::tag<3>*>::type = nullptr>
-		compound(const T* ptr);
+	template <class T>
+	compound(const T* ptr);
 
 	// Operations ==============================================================
 	template <class T>
@@ -69,6 +37,15 @@ public:
 	// Friends =================================================================
 	template <class Cloner2, class Deleter2>
 	friend class compound;
+
+private:
+	// Private constructors ====================================================
+	// 2nd argument: whether Cloner  is_constructible from const T*
+	// 3nd argument: whether Deleter is_constructible from const T*
+	template <class T> compound(const T* ptr, std::false_type, std::false_type);
+	template <class T> compound(const T* ptr, std::false_type, std::true_type);
+	template <class T> compound(const T* ptr, std::true_type,  std::false_type);
+	template <class T> compound(const T* ptr, std::true_type,  std::true_type);
 };
 
 } // namespace pl
