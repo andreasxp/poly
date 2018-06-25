@@ -81,7 +81,13 @@ poly<Animal, pl::unique<Animal>> p2 = make<poly<Animal, pl::unique<Animal>>, Dog
 auto p3 = p1; //Works, internal object is also copied
 auto p4 = p2; //Error: p2 is not copy-constructible
 ```
-You can make your own policies, too. A basic policy looks like the following:
+You can make your own policies, too. For a type `T`, a valid policy class provides:
+1. A default constructor;
+2. A constructor from `const T* ptr`;
+3. A `clone` method that clones the provided pointer;
+4. A `destroy` method that deletes the pointer.  
+
+A basic policy looks like the following:
 ```c++
 class my_policy {
     my_policy(); //Default constructor
