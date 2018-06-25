@@ -22,4 +22,4 @@ private:
 
 } // namespace pl
 
-#include "poly_factory.inl"
+#include "factory.inl"

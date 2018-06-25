@@ -10,7 +10,7 @@
 \brief   Macro to override typeid for rtti in poly
 \details Define POLY_CUSTOM_RTTI(type) as a function that returns
 your type's name. Do this **before** including poly.hpp
-or poly_factory.hpp.
+or factory.hpp.
 \example #define POLY_CUSTOM_RTTI(...) my_typeid(__VA_ARGS__).name();
 \example #define POLY_CUSTOM_RTTI(...) prid<__VA_ARGS__>().name();
 \see     https://github.com/andreasxp/prindex

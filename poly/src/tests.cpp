@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "tests.hpp"
 #include "poly.hpp"
-#include "poly_factory.hpp"
+#include "factory.hpp"
 
 using pl::poly;
 using namespace std;
@@ -94,7 +94,7 @@ void Tester::run() {
 		TEST(std::hash<poly<Base, pl::unique<Base>>>()(p1) == std::hash<Base*>()(p1.get()));
 	}
 
-	// poly_factory ============================================================
+	// factory ============================================================
 	{
 		pl::factory<Base> f;
 		f.insert<Der>();

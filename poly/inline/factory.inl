@@ -1,5 +1,5 @@
 #pragma once
-#include "poly_factory.hpp"
+#include "factory.hpp"
 #include <algorithm>
 
 namespace pl {
@@ -8,9 +8,9 @@ template <class Base, class CopyDeletePolicy>
 template<class Derived>
 void factory<Base, CopyDeletePolicy>::insert() {
 	static_assert(std::is_base_of<Base, Derived>::value,
-		"poly_factory: factory can only build types, derived from Base");
+		"factory: factory can only build types, derived from Base");
 	static_assert(std::is_default_constructible<Derived>::value,
-		"poly_factory: factory can only build default-constructible types");
+		"factory: factory can only build default-constructible types");
 
 	auto name = POLY_TYPE_NAME(Derived);
 
@@ -54,7 +54,7 @@ factory<Base, CopyDeletePolicy>::make(const std::string& name) const {
 	}
 
 	throw std::invalid_argument(
-		std::string("poly_factory: ") +
+		std::string("factory: ") +
 		name +
 		" is not registered in this factory");
 }
