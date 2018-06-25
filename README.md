@@ -91,7 +91,7 @@ class my_policy {
     void destroy(T* ptr); //Destroys the object held by ptr.
 };
 ```
-You can also group copy- and delete policies with `pl::compound`. See the [documentation](#documentation) for more details.
+You can also group copy- and delete policies with `pl::compound`. See the [documentation](#class-compound) for more details.
 
 *Note: if `poly` is copyable but the derived object is not, on copy a runtime exception will occur.*
 
@@ -260,5 +260,42 @@ Returns a list of all types, registered in the factory, as a `std::vector` of `s
 poly<Base, CopyDeletePolicy> make(const std::string& name) const;
 ```
 Makes a `poly<Base, CopyDeletePolicy>`, holding a type, represented by the string `name`. The required type must be registered using `insert` before a `poly` of that type can be made. If no such type is registered, a runtime exception is thrown.
+### `class compound`
+```c++
+template <class Cloner, class Deleter>
+class compound;
+```
+`compound` is a helper class that can be used to build policies for `poly`. When instantiated with a cloner and a deleter, `compound` becomes a valid CopyDeletePolicy.
+Both `Cloner` and `Deleter` are classes that
+1. Provide either or both:
+    * a constructor from `const T*`, where `T` is the type on which the class operates;
+    * a default constructor.  
+    
+    If both constructors are provided, the class will be instantiated with `const T*`.
+2. An `operator()`:  
+    * For `Cloner`, `operator()` accepts `const T*` and returns a pointer to a copied object;  
+    * For `Deleter`, `operator()` accepts `T*`, destroys the object, and returns nothing.
+
+All pre-defined policies were made using `compound`.
+### `unique`
+```c++
+template <class Base>
+using unique = compound<no_copy,
+	typename std::conditional<std::has_virtual_destructor<Base>::value,
+	std::default_delete<Base>,
+	pmr_delete<Base>>::type>;
+```
+`unique` is a policy for `poly` that disallows copying. When instantiated with this policy, `poly` is not CopyConstructible nor CopyAssignable.
+`unique` is destructor-permissive: if no virtual destructor was provided, this policy guarantees that the object will be destructed properly and without memory leaks.
+### `deep`
+```c++
+template <class Base>
+using deep = compound<deep_copy<Base>,
+	typename std::conditional<std::has_virtual_destructor<Base>::value,
+	std::default_delete<Base>,
+	pmr_delete<Base>>::type>;
+```
+`deep` is a policy for `poly` that allows copying. When instantiated with this policy, `poly` is CopyConstructible and CopyAssignable.
+`deep` is destructor-permissive: if no virtual destructor was provided, this policy guarantees that the object will be destructed properly and without memory leaks.
 ## License
 This project is licenced under the MIT licence. It is free for personal and commercial use.
