@@ -91,7 +91,7 @@ class my_policy {
     void destroy(T* ptr); //Destroys the object held by ptr.
 };
 ```
-You can also group copy- and delete policies with `pl::compound`. See the [documentation](#documentation) for more details.
+You can also group copy- and delete policies with `pl::compound`. See the [documentation](#class-compound) for more details.
 
 *Note: if `poly` is copyable but the derived object is not, on copy a runtime exception will occur.*
 
@@ -295,7 +295,7 @@ using deep = compound<deep_copy<Base>,
 	std::default_delete<Base>,
 	pmr_delete<Base>>::type>;
 ```
-`deep` is a policy for `poly` that allows copying. When instantiated with this policy, `poly` is not CopyConstructible nor CopyAssignable.
+`deep` is a policy for `poly` that allows copying. When instantiated with this policy, `poly` is CopyConstructible and CopyAssignable.
 `deep` is destructor-permissive: if no virtual destructor was provided, this policy guarantees that the object will be destructed properly and without memory leaks.
 ## License
 This project is licenced under the MIT licence. It is free for personal and commercial use.
