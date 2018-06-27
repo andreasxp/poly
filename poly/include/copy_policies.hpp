@@ -4,7 +4,11 @@
 namespace pl {
 
 /// Empty class. Provides no operator(), so a policy is not copyable.
-class no_copy {};
+class no_copy {
+	/// Dummy operator. Static asserts if called.
+	template <class T>
+	T* operator()(const T*);
+};
 
 /// Stores a pointer to a function that copies the Base pointer
 template <class Base>
@@ -26,6 +30,12 @@ private:
 	template <class Base2>
 	friend class deep_copy;
 };
+
+template<class T>
+inline T* no_copy::operator()(const T*) {
+	static_assert("no_copy: this policy forbids copying");
+	return nullptr;
+}
 
 } // namespace pl
 

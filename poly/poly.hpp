@@ -956,12 +956,12 @@ void factory<Base, CopyDeletePolicy>::insert() {
 	static_assert(std::is_default_constructible<Derived>::value,
 		"factory: factory can only build default-constructible types");
 
-	auto name = POLY_TYPE_NAME(Derived);
+	std::string name(POLY_TYPE_NAME(Derived));
 
 	auto it = std::lower_bound(make_funcs.cbegin(), make_funcs.cend(), name,
 		[](
 		const std::pair<std::string, poly<Base, CopyDeletePolicy>(*)()>& lhs,
-		const decltype(name)& rhs) {
+		const std::string& rhs) {
 		return lhs.first < rhs;
 	});
 
@@ -989,7 +989,7 @@ factory<Base, CopyDeletePolicy>::make(const std::string& name) const {
 	auto it = std::lower_bound(make_funcs.cbegin(), make_funcs.cend(), name,
 		[](
 		const std::pair<std::string, poly<Base, CopyDeletePolicy>(*)()>& lhs,
-		const decltype(name)& rhs) {
+		const std::string& rhs) {
 		return lhs.first < rhs;
 	});
 
