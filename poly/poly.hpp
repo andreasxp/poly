@@ -594,7 +594,7 @@ template<class Base, class CopyDeletePolicy>
 inline poly<Base, CopyDeletePolicy>::poly(const poly& other) :
 	policy(other),
 	data(nullptr) {
-	if (other) data = clone(other.get());
+	if (other) data = this->clone(other.get());
 }
 
 template<class Base, class CopyDeletePolicy>
@@ -609,7 +609,7 @@ poly<Base, CopyDeletePolicy>::operator=(const poly& other) {
 	policy::operator=(other);
 
 	reset();
-	if (other) data = clone(other.get());
+	if (other) data = this->clone(other.get());
 	
 	return *this;
 }
@@ -646,7 +646,7 @@ inline poly<Base, CopyDeletePolicy>::
 poly(const poly<Base2, CopyDeletePolicy2>& other) :
 	policy(static_cast<CopyDeletePolicy2>(other)),
 	data(nullptr) {
-	if (other) data = clone(other.get());
+	if (other) data = this->clone(other.get());
 }
 
 template<class Base, class CopyDeletePolicy>
@@ -697,7 +697,7 @@ poly<Base, CopyDeletePolicy>::operator=(Derived* obj) {
 
 template<class Base, class CopyDeletePolicy>
 inline poly<Base, CopyDeletePolicy>::~poly() {
-	if (data) destroy(get());
+	if (data) this->destroy(get());
 }
 
 // Observers ===============================================================
@@ -877,12 +877,12 @@ bool operator!=(std::nullptr_t, const poly<B, P>& x) noexcept {
 
 template <class B, class P>
 bool operator<(const poly<B, P>& x, std::nullptr_t) {
-	return std::less<poly<B, P>::base_type*>()(x.get(), nullptr);
+	return std::less<typename poly<B, P>::base_type*>()(x.get(), nullptr);
 }
 
 template <class B, class P>
 bool operator<(std::nullptr_t, const poly<B, P>& y) {
-	return std::less<poly<B, P>::base_type*>()(nullptr, y.get());
+	return std::less<typename poly<B, P>::base_type*>()(nullptr, y.get());
 }
 
 template <class B, class P>
@@ -922,7 +922,7 @@ namespace std {
 template<class Base, class CopyDeletePolicy>
 struct hash<pl::poly<Base, CopyDeletePolicy>> {
 	size_t operator()(const pl::poly<Base, CopyDeletePolicy>& x) const {
-		return hash<pl::poly<Base, CopyDeletePolicy>::base_type*>()(x.get());
+		return hash<typename pl::poly<Base, CopyDeletePolicy>::base_type*>()(x.get());
 	}
 };
 
