@@ -724,7 +724,7 @@ inline Base* poly<Base, CopyDeletePolicy>::release() noexcept {
 template<class Base, class CopyDeletePolicy>
 inline void poly<Base, CopyDeletePolicy>::reset(std::nullptr_t) noexcept {
 	if (data) {
-		destroy(data);
+		this->destroy(data);
 		data = nullptr;
 	}
 }
@@ -741,7 +741,7 @@ inline void poly<Base, CopyDeletePolicy>::reset(Derived* obj) {
 			"' must hold an object of exacly that type (not '" +
 			POLY_TYPE_NAME(*obj));
 
-	if (data) destroy(data);
+	if (data) this->destroy(data);
 	data = obj;
 	detail::inheritance_traits<Base, Derived>::set_offset(get(), obj);
 }
