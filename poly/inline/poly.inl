@@ -15,7 +15,7 @@ template<class Base, class CopyDeletePolicy>
 inline poly<Base, CopyDeletePolicy>::poly(const poly& other) :
 	policy(other),
 	data(nullptr) {
-	if (other) data = clone(other.get());
+	if (other) data = this->clone(other.get());
 }
 
 template<class Base, class CopyDeletePolicy>
@@ -30,7 +30,7 @@ poly<Base, CopyDeletePolicy>::operator=(const poly& other) {
 	policy::operator=(other);
 
 	reset();
-	if (other) data = clone(other.get());
+	if (other) data = this->clone(other.get());
 	
 	return *this;
 }
@@ -67,7 +67,7 @@ inline poly<Base, CopyDeletePolicy>::
 poly(const poly<Base2, CopyDeletePolicy2>& other) :
 	policy(static_cast<CopyDeletePolicy2>(other)),
 	data(nullptr) {
-	if (other) data = clone(other.get());
+	if (other) data = this->clone(other.get());
 }
 
 template<class Base, class CopyDeletePolicy>
@@ -118,7 +118,7 @@ poly<Base, CopyDeletePolicy>::operator=(Derived* obj) {
 
 template<class Base, class CopyDeletePolicy>
 inline poly<Base, CopyDeletePolicy>::~poly() {
-	if (data) destroy(get());
+	if (data) this->destroy(get());
 }
 
 // Observers ===============================================================
