@@ -31,6 +31,14 @@ inline typename std::enable_if<
 
 } // namespace detail
 
+// class no_copy ===============================================================
+
+template<class T>
+inline T* no_copy::operator()(const T*) {
+	static_assert(false, "no_copy: this policy forbids copying");
+	return nullptr;
+}
+
 // class deep_copy =============================================================
 
 template<class Base>

@@ -142,7 +142,11 @@ compound(const T* ptr, std::true_type, std::true_type) :
 namespace pl {
 
 /// Empty class. Provides no operator(), so a policy is not copyable.
-class no_copy {};
+class no_copy {
+	/// Dummy operator. Static asserts if called.
+	template <class T>
+	T* operator()(const T*);
+};
 
 /// Stores a pointer to a function that copies the Base pointer
 template <class Base>

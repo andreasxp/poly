@@ -31,12 +31,6 @@ private:
 	friend class deep_copy;
 };
 
-template<class T>
-inline T* no_copy::operator()(const T*) {
-	static_assert("no_copy: this policy forbids copying");
-	return nullptr;
-}
-
 } // namespace pl
 
 #include "copy_policies.inl"
