@@ -117,40 +117,40 @@ template<class B1, class P1, class B2, class P2>
 bool operator>=(const poly<B1, P1>& x, const poly<B2, P2>& y);
 
 template <class B, class P>
-bool operator==(const poly<B, P>& x, nullptr_t) noexcept;
+bool operator==(const poly<B, P>& x, std::nullptr_t) noexcept;
 
 template <class B, class P>
-bool operator==(nullptr_t, const poly<B, P>& x) noexcept;
+bool operator==(std::nullptr_t, const poly<B, P>& x) noexcept;
 
 template <class B, class P>
-bool operator!=(const poly<B, P>& x, nullptr_t) noexcept;
+bool operator!=(const poly<B, P>& x, std::nullptr_t) noexcept;
 
 template <class B, class P>
-bool operator!=(nullptr_t, const poly<B, P>& x) noexcept;
+bool operator!=(std::nullptr_t, const poly<B, P>& x) noexcept;
 
 template <class B, class P>
-bool operator<(const poly<B, P>& x, nullptr_t);
+bool operator<(const poly<B, P>& x, std::nullptr_t);
 
 template <class B, class P>
-bool operator<(nullptr_t, const poly<B, P>& y);
+bool operator<(std::nullptr_t, const poly<B, P>& y);
 
 template <class B, class P>
-bool operator<=(const poly<B, P>& x, nullptr_t);
+bool operator<=(const poly<B, P>& x, std::nullptr_t);
 
 template <class B, class P>
-bool operator<=(nullptr_t, const poly<B, P>& y);
+bool operator<=(std::nullptr_t, const poly<B, P>& y);
 
 template <class B, class P>
-bool operator>(const poly<B, P>& x, nullptr_t);
+bool operator>(const poly<B, P>& x, std::nullptr_t);
 
 template <class B, class P>
-bool operator>(nullptr_t, const poly<B, P>& y);
+bool operator>(std::nullptr_t, const poly<B, P>& y);
 
 template <class B, class P>
-bool operator>=(const poly<B, P>& x, nullptr_t);
+bool operator>=(const poly<B, P>& x, std::nullptr_t);
 
 template <class B, class P>
-bool operator>=(nullptr_t, const poly<B, P>& y);
+bool operator>=(std::nullptr_t, const poly<B, P>& y);
 
 } // namespace pl
 

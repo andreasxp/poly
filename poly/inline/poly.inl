@@ -252,11 +252,13 @@ template<class B1, class C1, class B2, class C2>
 
 template<class B1, class C1, class B2, class C2>
 	bool operator<(const poly<B1, C1>& x, const poly<B2, C2>& y) {
-	using common = std::common_type<poly<B1, C1>::base_type*, poly<B2, C2>::base_type*>;
+	using common = std::common_type<
+		typename poly<B1, C1>::base_type*, 
+		typename poly<B2, C2>::base_type*>;
 	static_assert(detail::defines_type<common>::value, 
 		"comparison: these poly types cannot be compared: internal objects must have the same class, or be convertible to one base class");
 
-	return std::less<common::type>()(x.get(), y.get());
+	return std::less<typename common::type>()(x.get(), y.get());
 }
 
 template<class B1, class P1, class B2, class P2>
@@ -275,62 +277,62 @@ template<class B1, class P1, class B2, class P2>
 }
 
 template <class B, class P>
-bool operator==(const poly<B, P>& x, nullptr_t) noexcept {
+bool operator==(const poly<B, P>& x, std::nullptr_t) noexcept {
 	return !(x != nullptr);
 }
 
 template <class B, class P>
-bool operator==(nullptr_t, const poly<B, P>& x) noexcept {
+bool operator==(std::nullptr_t, const poly<B, P>& x) noexcept {
 	return !(nullptr != x);
 }
 
 template <class B, class P>
-bool operator!=(const poly<B, P>& x, nullptr_t) noexcept {
+bool operator!=(const poly<B, P>& x, std::nullptr_t) noexcept {
 	return static_cast<bool>(x);
 }
 
 template <class B, class P>
-bool operator!=(nullptr_t, const poly<B, P>& x) noexcept {
+bool operator!=(std::nullptr_t, const poly<B, P>& x) noexcept {
 	return static_cast<bool>(x);
 }
 
 template <class B, class P>
-bool operator<(const poly<B, P>& x, nullptr_t) {
+bool operator<(const poly<B, P>& x, std::nullptr_t) {
 	return std::less<poly<B, P>::base_type*>()(x.get(), nullptr);
 }
 
 template <class B, class P>
-bool operator<(nullptr_t, const poly<B, P>& y) {
+bool operator<(std::nullptr_t, const poly<B, P>& y) {
 	return std::less<poly<B, P>::base_type*>()(nullptr, y.get());
 }
 
 template <class B, class P>
-bool operator<=(const poly<B, P>& x, nullptr_t) {
+bool operator<=(const poly<B, P>& x, std::nullptr_t) {
 	return !(nullptr < x);
 }
 
 template <class B, class P>
-bool operator<=(nullptr_t, const poly<B, P>& y) {
+bool operator<=(std::nullptr_t, const poly<B, P>& y) {
 	return !(y < nullptr);
 }
 
 template <class B, class P>
-bool operator>(const poly<B, P>& x, nullptr_t) {
+bool operator>(const poly<B, P>& x, std::nullptr_t) {
 	return nullptr < x;
 }
 
 template <class B, class P>
-bool operator>(nullptr_t, const poly<B, P>& y) {
+bool operator>(std::nullptr_t, const poly<B, P>& y) {
 	return y < nullptr;
 }
 
 template <class B, class P>
-bool operator>=(const poly<B, P>& x, nullptr_t) {
+bool operator>=(const poly<B, P>& x, std::nullptr_t) {
 	return !(x < nullptr);
 }
 
 template <class B, class P>
-bool operator>=(nullptr_t, const poly<B, P>& y) {
+bool operator>=(std::nullptr_t, const poly<B, P>& y) {
 	return !(nullptr < y);
 }
 
