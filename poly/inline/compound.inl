@@ -30,7 +30,7 @@ template<class T>
 template<class Cloner, class Deleter>
 template<class T>
 inline auto compound<Cloner, Deleter>::clone(const T* ptr)
-->decltype(Cloner::operator()(ptr)) {
+->decltype(std::declval<Cloner>()(ptr)) {
 	return Cloner::operator()(ptr);
 }
 

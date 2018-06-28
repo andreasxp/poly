@@ -31,7 +31,7 @@ public:
 
 	// Operations ==============================================================
 	template <class T>
-	auto clone(const T* ptr) -> decltype(Cloner::operator()(ptr));
+	auto clone(const T* ptr) -> decltype(std::declval<Cloner>()(ptr));
 
 	template <class T>
 	void destroy(T* ptr);
