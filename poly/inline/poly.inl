@@ -91,8 +91,7 @@ inline poly<Base, CopyDeletePolicy>::poly(Derived* obj) :
 		throw std::runtime_error(
 			std::string("poly: passed pointer of type '") +
 			POLY_TYPE_NAME(Derived) +
-			"' must hold an object of exacly that type (not '" +
-			POLY_TYPE_NAME(*obj));
+			"' must not point to a polymorphic object");
 
 	detail::inheritance_traits<Base, Derived>::set_offset(get(), obj);
 }
@@ -107,8 +106,7 @@ poly<Base, CopyDeletePolicy>::operator=(Derived* obj) {
 		throw std::runtime_error(
 			std::string("poly: passed pointer of type '") +
 			POLY_TYPE_NAME(Derived) +
-			"' must hold an object of exacly that type (not '" +
-			POLY_TYPE_NAME(*obj));
+			"' must not point to a polymorphic object");
 
 	reset(obj);
 	detail::inheritance_traits<Base, Derived>::set_offset(get(), obj);
@@ -159,8 +157,7 @@ inline void poly<Base, CopyDeletePolicy>::reset(Derived* obj) {
 		throw std::runtime_error(
 			std::string("poly: passed pointer of type '") +
 			POLY_TYPE_NAME(Derived) +
-			"' must hold an object of exacly that type (not '" +
-			POLY_TYPE_NAME(*obj));
+			"' must not point to a polymorphic object");
 
 	if (data) this->destroy(data);
 	data = obj;
