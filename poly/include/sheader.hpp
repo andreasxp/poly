@@ -20,9 +20,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef POLY_HPP
-#define POLY_HPP
-
+#pragma once
 #include "factory.hpp"
-
-#endif // POLY_HPP
