@@ -50,6 +50,9 @@
     <ClInclude Include="include\factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\sheader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="inline\poly.inl">
