@@ -3,14 +3,14 @@
 
 namespace pl {
 
-/// Empty class. Provides no operator(), so a policy is not copyable.
+// Empty class. Provides no operator(), so a policy is not copyable.
 class no_copy {
 	/// Dummy operator. Static asserts if called.
 	template <class T>
 	T* operator()(const T*);
 };
 
-/// Stores a pointer to a function that copies the Base pointer
+// Stores a pointer to a function that copies the Base pointer
 template <class Base>
 class deep_copy {
 public:

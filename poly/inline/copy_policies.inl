@@ -5,7 +5,7 @@
 namespace pl {
 namespace detail {
 
-/// Casts Base* to Derived* using inheritance_traits and copies it
+// Casts Base* to Derived* using inheritance_traits and copies it
 template<class Base, class Derived>
 inline typename std::enable_if<
 	std::is_copy_constructible<Derived>::value, Base*>::type
@@ -16,7 +16,7 @@ inline typename std::enable_if<
 	return static_cast<Base*>(rslt);
 }
 
-/// Placeholder for when Derived is not CopyConstructible. Throws on call.
+// Placeholder for when Derived is not CopyConstructible. Throws on call.
 template<class Base, class Derived>
 inline typename std::enable_if<
 	!std::is_copy_constructible<Derived>::value, Base*>::type // Note the !
@@ -35,6 +35,7 @@ inline typename std::enable_if<
 
 template<class T>
 inline T* no_copy::operator()(const T*) {
+	// sizeof(T) < 0 enables lazy evaluation, no_copy fails only if called
 	static_assert(sizeof(T) < 0, "no_copy: this policy forbids copying");
 	return nullptr;
 }
