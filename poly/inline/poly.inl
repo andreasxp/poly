@@ -218,25 +218,6 @@ PolyType transform(poly<OldBase, CopyDeletePolicy>&& other) {
 }
 
 // Comparison operators ========================================================
-
-namespace detail {
-
-template<class T, class R = void>
-struct enable_if_defined {
-	using type = R;
-};
-
-template<class T, class Enable = void>
-struct defines_type : std::false_type {
-};
-
-template<class T>
-struct defines_type<
-	T, typename enable_if_defined<typename T::type>::type> : std::true_type {
-};
-
-} // namespace detail
-
 template<class B1, class C1, class B2, class C2>
 	bool operator==(const poly<B1, C1>& x, const poly<B2, C2>& y) {
 	return x.get() == y.get();

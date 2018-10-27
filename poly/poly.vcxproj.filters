@@ -44,13 +44,13 @@
     <ClInclude Include="include\policy.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\cv_checks.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\factory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\sheader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\traits.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

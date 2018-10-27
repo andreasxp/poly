@@ -46,5 +46,19 @@ struct is_weaker_qualified
 		is_less_cv<T, U>::value)> {
 };
 
+template<class T, class R = void>
+struct enable_if_defined {
+	using type = R;
+};
+
+template<class T, class Enable = void>
+struct defines_type : std::false_type {
+};
+
+template<class T>
+struct defines_type<
+	T, typename enable_if_defined<typename T::type>::type> : std::true_type {
+};
+
 } // namespace detail
 } // namespace pl

@@ -134,7 +134,7 @@
     <ClInclude Include="include\compound.hpp" />
     <ClInclude Include="include\copy_policies.hpp" />
     <ClInclude Include="include\delete_policies.hpp" />
-    <ClInclude Include="include\cv_checks.hpp" />
+    <ClInclude Include="include\traits.hpp" />
     <ClInclude Include="include\policy.hpp" />
     <ClInclude Include="include\poly.hpp" />
     <ClInclude Include="include\inheritance_traits.hpp" />

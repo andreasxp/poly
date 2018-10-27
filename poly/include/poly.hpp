@@ -9,7 +9,7 @@
 #include <utility>     // forward
 
 #include "policy.hpp"
-#include "cv_checks.hpp"
+#include "traits.hpp"
 
 namespace pl {
 
