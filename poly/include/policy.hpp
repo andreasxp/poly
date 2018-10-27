@@ -5,6 +5,9 @@
 #include "delete_policies.hpp"
 
 namespace pl {
+// Default poliices, provided with the library.
+// By default, both of these policies accept types with no virtual destructors,
+// and use a special deleter that prevents memory leaks.
 
 template <class Base>
 using unique = compound<no_copy,
