@@ -71,14 +71,16 @@ poly<Fish>   poly_fishy = pl::transform<poly<Dog>, Dog>(poly_mammal); //Compile 
 
 #### Using policies to customize the behavior of `poly`
 `poly` has an optional second template parameter called CopyDeletePolicy. It defines the behavior of `poly` when a copy-constructor or a destructor is invoked. `poly.hpp` contains 2 pre-built policies:  
-* `pl::deep` (default): When `poly` is copied, internal object is copied as well. `pl::deep` invokes the proper copy-constructor of the derived object. That means you don't need to add the `clone` method to your class. `pl::deep` is also destructor-permissive: if you forgot to define your base class destructor `virtual`, the pointer in `poly` will still be deleted without any memory leaks.  
-`pl::deep` adds a memory overhead of one pointer if the base class has a virtual destructor, and 2 pointers if it doesn't.
-* `pl::unique`: With this policy, `poly` behaves like a `unique_ptr` (a.k.a. is not copy-constructible). `pl::unique` is also destructor-permissive.  
-`pl::unique` adds no memory overhead if the base class has a virtual destructor, and an overhead of 1 pointer if it doesn't.
+* `pl::deep` (default): When `poly` is copied, internal object is copied as well. `pl::deep` invokes the proper copy-constructor of the derived object. That means you don't need to add the `clone` method to your class. `pl::deep` has a static check for a virtual destructor in base class to prevent memory leaks.
+`pl::deep` adds a memory overhead of one pointer.
+* `pl::unique`: With this policy, `poly` behaves like a `unique_ptr` (a.k.a. is not copy-constructible). `pl::unique` also checks for memory leaks.  
+`pl::unique` adds no memory overhead.
 
 ```c++
-poly<Animal, pl::deep<Animal>> p1 = pl::make<poly<Animal, pl::deep<Animal>>, Dog>(); //Same as poly<Animal> p1 = pl::make<poly<Animal>, Dog>()
-poly<Animal, pl::unique<Animal>> p2 = make<poly<Animal, pl::unique<Animal>>, Dog>();
+poly<Animal, pl::deep<Animal>> p1 = 
+    pl::make<poly<Animal, pl::deep<Animal>>, Dog>(); //Same as poly<Animal> p1 = pl::make<poly<Animal>, Dog>()
+poly<Animal, pl::unique<Animal>> p2 = 
+    pl::make<poly<Animal, pl::unique<Animal>>, Dog>();
 
 auto p3 = p1; //Works, internal object is also copied
 auto p4 = p2; //Error: p2 is not copy-constructible
@@ -294,7 +296,7 @@ using unique = compound<no_copy,
 	pmr_delete<Base>>::type>;
 ```
 `unique` is a policy for `poly` that disallows copying. When instantiated with this policy, `poly` is not CopyConstructible nor CopyAssignable.
-`unique` is destructor-permissive: if no virtual destructor was provided, this policy guarantees that the object will be destructed properly and without memory leaks.
+If the base class does not have a virtual destructor, `unique` will raise a compiler error on `operator()` call to prevent memory leaks.
 ### `deep`
 ```c++
 template <class Base>
@@ -304,6 +306,6 @@ using deep = compound<deep_copy<Base>,
 	pmr_delete<Base>>::type>;
 ```
 `deep` is a policy for `poly` that allows copying. When instantiated with this policy, `poly` is CopyConstructible and CopyAssignable.
-`deep` is destructor-permissive: if no virtual destructor was provided, this policy guarantees that the object will be destructed properly and without memory leaks.
+If the base class does not have a virtual destructor, `deep` will raise a compiler error on `operator()` call to prevent memory leaks.
 ## License
 This project is licenced under the MIT licence. It is free for personal and commercial use.
