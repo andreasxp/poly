@@ -1,5 +1,8 @@
 #pragma once
 #include <string>
+#include "poly.hpp"
+
+using pl::poly;
 
 class Tester {
 private:
@@ -46,4 +49,8 @@ struct Der : Mid1, Mid2 {
 
 	virtual std::string name() { return der_name; }
 	Der() : der_name("der") {}
+};
+
+struct Self_Ptr {
+	poly<Self_Ptr> val;
 };

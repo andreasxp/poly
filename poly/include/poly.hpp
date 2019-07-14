@@ -15,8 +15,9 @@ namespace pl {
 
 template<class Base, class CopyDeletePolicy = deep<Base>>
 class poly : private CopyDeletePolicy {
-	static_assert(std::is_polymorphic<Base>::value,
-		"poly: Base is not polymorphic, poly is useless. Consider using std::unique_ptr instead.");
+	// Static check performed in constructors instead for late evaluation.
+	//static_assert(std::is_polymorphic<Base>::value,
+	//	"poly: Base is not polymorphic, poly is useless. Consider using std::unique_ptr instead.");
 public:
 	using base_type = Base;
 	using policy = CopyDeletePolicy;

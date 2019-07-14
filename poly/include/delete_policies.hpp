@@ -3,6 +3,15 @@
 
 namespace pl {
 
+/// Adds a virtual destructor check to std::default_delete
+template <class Base>
+class default_delete : public std::default_delete<Base> {
+public:
+	using std::default_delete<Base>::default_delete; // Inherit constructors
+
+	void operator()(const Base* ptr) const;
+};
+
 /// Holds a function that casts object to derived before deleting
 template <class Base>
 class pmr_delete {
@@ -15,7 +24,7 @@ public:
 	template <class Derived>
 	pmr_delete(const Derived*);
 
-	void operator()(const Base* other);
+	void operator()(const Base* ptr);
 
 private:
 	void (*destroy_ptr)(const Base*);

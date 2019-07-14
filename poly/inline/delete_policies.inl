@@ -14,6 +14,15 @@ inline void	destroy(const Base* other) {
 
 } // namespace detail
 
+// class default_delete ========================================================
+
+template<class Base>
+inline void default_delete<Base>::operator()(const Base* ptr) const {
+	static_assert(std::has_virtual_destructor<Base>::value,
+		"default_delete: Base does not have a virtual destructor, a memory leak will occur.");
+	delete ptr;
+}
+
 // class pmr_delete ============================================================
 
 template<class Base>
@@ -36,8 +45,8 @@ inline pmr_delete<Base>::pmr_delete(const Derived*) :
 }
 
 template<class Base>
-inline void pmr_delete<Base>::operator()(const Base* other) {
-	destroy_ptr(other);
+inline void pmr_delete<Base>::operator()(const Base* ptr) {
+	destroy_ptr(ptr);
 }
 
 } // namespace pl

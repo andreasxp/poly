@@ -9,6 +9,8 @@ namespace pl {
 template<class Base, class CopyDeletePolicy>
 inline constexpr poly<Base, CopyDeletePolicy>::poly() noexcept :
 	data (nullptr) {
+	static_assert(std::is_polymorphic<Base>::value,
+		"poly: Base is not polymorphic, poly is useless. Consider using std::unique_ptr instead.");
 }
 
 template<class Base, class CopyDeletePolicy>
@@ -49,6 +51,8 @@ poly<Base, CopyDeletePolicy>::operator=(poly&& other) noexcept {
 template<class Base, class CopyDeletePolicy>
 inline constexpr poly<Base, CopyDeletePolicy>::poly(std::nullptr_t) noexcept :
 	data(nullptr) {
+	static_assert(std::is_polymorphic<Base>::value,
+		"poly: Base is not polymorphic, poly is useless. Consider using std::unique_ptr instead.");
 }
 
 template<class Base, class CopyDeletePolicy>
@@ -67,6 +71,9 @@ inline poly<Base, CopyDeletePolicy>::
 poly(const poly<Base2, CopyDeletePolicy2>& other) :
 	policy(static_cast<CopyDeletePolicy2>(other)),
 	data(nullptr) {
+	static_assert(std::is_polymorphic<Base>::value,
+		"poly: Base is not polymorphic, poly is useless. Consider using std::unique_ptr instead.");
+
 	if (other) data = this->clone(other.get());
 }
 
@@ -76,6 +83,8 @@ inline poly<Base, CopyDeletePolicy>::
 poly(poly<Base2, CopyDeletePolicy2>&& other) noexcept :
 	policy(std::move(static_cast<CopyDeletePolicy2>(other))),
 	data(other.release()) {
+	static_assert(std::is_polymorphic<Base>::value,
+		"poly: Base is not polymorphic, poly is useless. Consider using std::unique_ptr instead.");
 }
 
 // From a pointer ----------------------------------------------------------
@@ -85,6 +94,8 @@ template<class Derived>
 inline poly<Base, CopyDeletePolicy>::poly(Derived* obj) :
 	policy(obj),
 	data(obj) {
+	static_assert(std::is_polymorphic<Base>::value,
+		"poly: Base is not polymorphic, poly is useless. Consider using std::unique_ptr instead.");
 	static_assert(std::is_base_of<Base, Derived>::value,
 		"poly: poly can only be built using types, derived from Base");
 	if (typeid(*obj) != typeid(Derived))
